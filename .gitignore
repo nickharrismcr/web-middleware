@@ -1,0 +1,9 @@
+*.pyc
+*log
+*debug
+*.cfg
+*~
+*swp
+*docx
+*.project
+*.pydevproject
