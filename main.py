@@ -14,9 +14,8 @@ transports
 import signal,multiprocessing,logging 
 from multiprocessing import freeze_support
 
-
+import log
 import config 
-import log_setup
 import remote_dummy
 from manager import Manager  
 
@@ -29,11 +28,13 @@ def handler(signum, frame):
     exit()
    
 def main():
+    
+    
     signal.signal(signal.SIGTERM, handler)
-    
+       
     myconfig=config.Config("test.cfg")
-    log_setup.init(myconfig)
-    
+    log.init(myconfig)
+ 
     if myconfig.get_worker_config().conn_dir=="source":
         th=multiprocessing.Process(target=remote_dummy.run_dummy_server)
     else:

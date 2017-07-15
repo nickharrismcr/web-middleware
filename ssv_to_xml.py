@@ -7,8 +7,9 @@ import xmlconfig, configbase
 import xml.etree.ElementTree as ET 
 import etree_fns as ETF
 
+from decorators import trace 
              
-class ConverterToXML:
+class SSVToXML:
     
     """ 
     convert ssv input for a specific message type to XML using the relevant XMLMessageConfig and XMLRepeatConfig objects
@@ -26,6 +27,7 @@ class ConverterToXML:
         self.messageIDpath=config.get_worker_config_item("message",messageID_elem,None) 
         
     #-----------------------------------------------------------------------------------------------        
+    @trace("debug")
     def convert_request(self, ssv):
         
         if not self.delim in ssv:

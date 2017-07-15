@@ -4,13 +4,13 @@ Created on 13 Jul 2017
 @author: nick
 '''
 
-import SocketServer,socket, sys, logging 
+import SocketServer,socket,logging 
 
 import socket_mgr 
 from worker_socket import WorkerSocket
 from worker_stdio import WorkerStdio
-from convtossv import ConverterToSSV
-from convtoxml import ConverterToXML
+from xml_to_ssv import XMLToSSV
+from ssv_to_xml import SSVToXML
 
 
 worker_connectors = {
@@ -32,11 +32,11 @@ class Manager(object):
         self.datalog=logging.getLogger("datalog")
         
         if self.worker_config.conn_dir=="source":
-            self.request_converter=ConverterToXML(config, config.REQUEST)
-            self.response_converter=ConverterToSSV(config,config.RESPONSE)
-        else:
-            self.request_converter=ConverterToSSV(config, config.REQUEST)
-            self.response_converter=ConverterToXML(config,config.RESPONSE)
+            self.request_converter=SSVToXML(config, config.REQUEST)
+            self.response_converter=XMLToSSV(config,config.RESPONSE)
+        elif self.worker_config.conn_dir=="sink":
+            self.request_converter=XMLToSSV(config, config.REQUEST)
+            self.response_converter=SSVToXML(config,config.RESPONSE)
             
         self.worker_connector = worker_connectors[self.worker_config.conn_type](self.worker_config)
                                                                 
@@ -53,8 +53,7 @@ class Manager(object):
             self.poll_worker()
         elif self.worker_config.conn_dir=="sink":
             self.poll_socket()
-        else:
-            raise StandardError("Invalid worker configuration : "+self.worker_config.conn_dir)
+       
             
     def poll_worker(self):
         
@@ -73,7 +72,7 @@ class Manager(object):
                     self.datalog.info("Sent translated response to worker \n"+translated_resp)
                     self.worker_connector.send(translated_resp+"\n")
                 else:
-                    self.logdata.error("No response from remote server")
+                    self.datalog.error("No response from remote server")
             except IOError,e:
                 self.datalog.error("No response from remote server")
                 self.log.error("Error connecting to remote host : "+str(e))
@@ -85,7 +84,7 @@ class Manager(object):
  
             def handle(self):
 
-                #print >> sys.stderr, "handler log_setup : "+str(self.server.log_setup)
+                #print >> sys.stderr, "handler log : "+str(self.server.log)
                 self.server.log.info("Connection from %s %s " % self.client_address)
                 req=self.server.readmsg(self.request)
                 self.server.datalog.info("Received request :\n"+req)

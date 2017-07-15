@@ -6,9 +6,10 @@ Created on 12 Jul 2017
 util functions for the xml.etree.ElementTree lib 
 
 '''
+import re
 import xml.etree.ElementTree as ET
- 
 
+re_split=re.compile("><")
 
 def get_path_list(path):
     
@@ -16,22 +17,8 @@ def get_path_list(path):
     converts a path <tag1><tag2><tag2> to a list [ "tag1,"tag2",tag3" ] 
     """
     
-    l=[]
-    flag=0
-    currtag=""
-    for c in path:
-        if c=="<":
-            flag=1 
-            currtag=""
-        elif c==">":
-            l.append(currtag)
-            flag=0
-        else:
-            if flag==1:
-                currtag+=c 
-                
-    return l
-
+    return re_split.split(path[1:-1])
+ 
 def add_text_node_path(node, path,val):
 
     pathlist=get_path_list(path)
@@ -90,14 +77,13 @@ def get_node_at_path(node,path):
 
     return node 
 
-        
+      
 def pretty(node,indent=0,out=""):
    
     attribs=[ '%s="%s"' % (a,b) for a,b in node.attrib.iteritems() ]
     attrs=" "+" ".join(attribs) if len(attribs)>0 else ""
     
-    if node.text <> None and node.text.strip() <> "" :
-        
+    if node.text <> None and node.text.strip() <> "" :    
         out+="%s<%s%s>%s</%s>\n" % (" "*indent*3,node.tag,attrs,node.text,node.tag)
     else:
         out+="%s<%s%s>\n" % (" "*indent*3,node.tag,attrs)
@@ -112,10 +98,10 @@ def pretty(node,indent=0,out=""):
 def get_name(s):
      
     return s.split("<")[1].split(">")[0]
-            
+
+# unit test           
 if __name__=="__main__":
     
- 
     root=ET.Element("root")
     add_attribute_path(root, "<att1><att2><att3>", "att3att", "att3attval")
     add_text_node_path(root,"<lev1><lev2a><lev3a>", "value")

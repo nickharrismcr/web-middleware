@@ -4,7 +4,7 @@ Created on 14 Jul 2017
 @author: nick
 '''
 
-import SocketServer, sys, socket, time, struct 
+import SocketServer, sys, socket, time 
 from multiprocessing import freeze_support
 
 log=None

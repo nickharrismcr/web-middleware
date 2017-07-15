@@ -7,7 +7,7 @@ Created on 7 Jul 2017
 from collections import OrderedDict
 from workerconfig import WorkerConfig
 import configbase, xmlconfig
-import log_setup
+import log
 import re
 
 re_section = re.compile("^\[.*\]")

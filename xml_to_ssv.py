@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 import etree_fns as ETF
 from collections import OrderedDict
          
-class ConverterToSSV:
+class XMLToSSV:
     
     """ 
     convert XML input for a specific message type to ssv using the relevant XMLMessageConfig and XMLRepeatConfig objects
