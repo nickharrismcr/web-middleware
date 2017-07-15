@@ -7,17 +7,15 @@ Created on 13 Jul 2017
 import sys,time 
  
  
-
-print >> sys.stderr, "worker started"
 time.sleep(1)
+log=open("test_worker_sink.log","a")
+print >> log, "worker started"
 
 while [ 1 == 1 ]:
     
     inp=sys.stdin.readline()
-    time.sleep(1)
-    print >>sys.stderr, "read request" , inp
-    time.sleep(2)
+    print >>log, "stdio sink worker : read request" , inp
     sys.stdout.write( "TST|resp|resp2|resp3\n" )
-    print >>sys.stderr, "sent response TST|resp|resp2|resp3" 
+    print >>log, "stdio sink worker : sent response TST|resp|resp2|resp3" 
 
     

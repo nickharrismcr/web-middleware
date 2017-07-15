@@ -11,19 +11,20 @@ transports
 
 '''
 
-import signal,multiprocessing
+import signal,multiprocessing,logging 
+from multiprocessing import freeze_support
+
 
 import config 
-import logger as log
-import dummy_server
+import log_setup
+import remote_dummy
 from manager import Manager  
-from multiprocessing import freeze_support
 
 
 def handler(signum, frame):
     
     global mgr
-    log.log("SIGTERM signal reoeived. stopping worker")
+    logging.getLogger("log").critical("SIGTERM signal reoeived. stopping worker")
     mgr.stop()
     exit()
    
@@ -31,9 +32,12 @@ def main():
     signal.signal(signal.SIGTERM, handler)
     
     myconfig=config.Config("test.cfg")
-    log.init(myconfig)
+    log_setup.init(myconfig)
     
-    th=multiprocessing.Process(target=dummy_server.run_dummy_server)
+    if myconfig.get_worker_config().conn_dir=="source":
+        th=multiprocessing.Process(target=remote_dummy.run_dummy_server)
+    else:
+        th=multiprocessing.Process(target=remote_dummy.run_dummy_client)
     th.start()
     
     mgr=Manager(myconfig)

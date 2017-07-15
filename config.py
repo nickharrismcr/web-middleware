@@ -6,7 +6,8 @@ Created on 7 Jul 2017
  
 from collections import OrderedDict
 from workerconfig import WorkerConfig
-import configbase,logger,xmlconfig
+import configbase, xmlconfig
+import log_setup
 import re
 
 re_section = re.compile("^\[.*\]")
@@ -73,7 +74,7 @@ class Config:
         return self.configs["worker"].get_config_item("main","log", "webmw.log")
 
     def get_datalogfilename(self):
-        return self.configs["worker"].get_config_item("main", "datalog", "webmw.datalog")
+        return self.configs["worker"].get_config_item("main", "datalog", "webmw.data.log")
     
     def __str__(self):
         

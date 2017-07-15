@@ -4,7 +4,6 @@ Created on 7 Jul 2017
 @author: nick
 '''
 import xmlconfig, configbase
-import logger as log 
 import xml.etree.ElementTree as ET 
 import etree_fns as ETF
 

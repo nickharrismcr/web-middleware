@@ -7,7 +7,7 @@ util functions for the xml.etree.ElementTree lib
 
 '''
 import xml.etree.ElementTree as ET
-import logger as log
+ 
 
 
 def get_path_list(path):
@@ -111,7 +111,7 @@ def pretty(node,indent=0,out=""):
  
 def get_name(s):
      
-     return s.split("<")[1].split(">")[0]
+    return s.split("<")[1].split(">")[0]
             
 if __name__=="__main__":
     

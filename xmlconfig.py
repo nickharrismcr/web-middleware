@@ -9,7 +9,7 @@ each holds a dict of ConfigElement etc. objects,  one per config line
 
 from collections import OrderedDict
 import configbase
-import logger as log 
+ 
 
 
 classlookup = {     "element" :           configbase.ConfigElement ,

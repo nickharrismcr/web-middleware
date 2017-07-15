@@ -3,9 +3,8 @@ Created on 7 Jul 2017
 
 @author: nick
 '''
-import  xmlconfig, configbase, config 
+import  xmlconfig, configbase, config
 import xml.etree.ElementTree as ET
-import logger as log 
 import etree_fns as ETF
 from collections import OrderedDict
          

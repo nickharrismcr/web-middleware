@@ -4,25 +4,27 @@ Created on 13 Jul 2017
 @author: nick
 '''
 
-import   socket, SocketServer 
-import logger as log 
+import   socket, SocketServer , logging
+ 
  
 class MyTCPServer(SocketServer.TCPServer):
     
     def __init__(self, server_address, RequestHandlerClass, manager):
         
-        SocketServer.TCPServer.__init__(self, server_address,RequestHandlerClass)
+        SocketServer.TCPServer.__init__(self, server_address,RequestHandlerClass, bind_and_activate=False)
         self.manager=manager 
-    
-    def readmsg(self):
+        self.log=logging.getLogger("log")
+        self.datalog=logging.getLogger("datalog")
         
+       
+
+    def readmsg(self,conn):
         resp=""
         while 1:
-            data=self.request.recv(1024).strip()
+            data=conn.recv(1024).strip()
             if not data:
                 break
-            resp+=data
-            
+            resp+=data 
         return resp 
 
 class SocketMgr(object):
@@ -41,19 +43,24 @@ class SocketMgr(object):
             self.port=int(self.config.get_config_item("main","remoteport",None))
         elif self.type=="sink":
             self.port=int(self.config.get_config_item("transport","port",None))
- 
+        self.log=logging.getLogger("log")
+
     
     def listen(self, manager, handler_class ):
 
         # manager is a reference to the calling Manager object
-        log.log("Starting server on %s : %s " % ("localhost", self.port))
-        self.server = MyTCPServer(("localhost", self.port), handler_class, manager)
-        log.log("Listening on %s : %s " % ("localhost", self.port))
+        self.log.info("Starting server on %s : %s " % ("localhost", self.port))
+ 
+        self.server = MyTCPServer(("localhost", self.port), handler_class, manager  )
+        self.server.allow_reuse_address=True
+        self.server.server_bind()
+        self.server.server_activate()
+        self.log.info("Listening on %s : %s " % ("localhost", self.port))
         self.server.serve_forever()
         
     def connect(self):
         
-        log.log("Connecting to remote host %s : %s " % ((self.ipaddr, self.port)))
+        self.log.info("Connecting to remote host %s : %s " % ((self.ipaddr, self.port)))
         try:
             self.socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
             self.socket.connect((self.ipaddr,self.port))

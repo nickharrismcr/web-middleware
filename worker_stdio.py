@@ -4,8 +4,8 @@ Created on 13 Jul 2017
 @author: nick
 '''
 
-import subprocess
-import logger as log 
+import subprocess,logging
+ 
 
 class WorkerStdio(object):
     '''
@@ -17,11 +17,11 @@ class WorkerStdio(object):
         '''
         Constructor
         '''
-        pass
+        self.log=logging.getLogger("log")
     
     def start_worker(self, command ):
         
-        log.log("Starting stdio worker : %s " % command )
+        self.log.info("Starting stdio worker : %s " % command )
         try:
             self.pipe=subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE )
         except:
