@@ -10,7 +10,6 @@ import logging,sys
 
 DEBUGMODE=False 
 
-
 def init(config):
     
     global logger_config, DEBUGMODE 
