@@ -3,7 +3,7 @@ Created on 9 Jul 2017
 
 @author: nick
 
-items element classes and util functions
+config message element classes and util functions for parsing the config file 
 
 '''
 
@@ -12,7 +12,6 @@ import re
 import xml.etree.ElementTree as ET
 import etree_fns as ETF 
  
-
 re_subsection = re.compile("^<.*>")
 
 #---------------------------------------------------------------------------------------------------------------------                    
@@ -51,7 +50,7 @@ def get_sections(indata):
     indict[curr_subsection]=(params,block)
     return indict
 
-
+#--------------------------------------------------------------------------------------------------------------------- 
 def get_section(line):
     return line.split("[")[1].split("]")[0].split()
      
@@ -83,12 +82,17 @@ def read_config(readers, what, data):
     else:
         return data
 
-#---------------------------------------------------------------------------------------------------------------------                    
+#---------------------------------------------------------------------------------------------------------------------      
+#---------------------------------------------------------------------------------------------------------------------       
+#---------------------------------------------------------------------------------------------------------------------       
+# classes for message config elements.  all have methods for getting text content of their 
+# specified xml node from the passed in tree and adding it to the ssv list, and getting an ssv line value 
+# and creating an xml node on the passed in tree containing it as text. 
+              
 class ConfigElement(object): 
     
     """ 
     holds data for an individual element type items line
-    and knows how to add it to an xml tree 
     """
 
     def __init__(self,config, lineno, what):
