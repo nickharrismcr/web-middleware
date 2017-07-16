@@ -6,17 +6,13 @@ Created on 13 Jul 2017
 
 import SocketServer,socket,logging 
 
-import socket_mgr 
+import tcp_socket  
 from worker_socket import WorkerSocket
 from worker_stdio import WorkerStdio
 from xml_to_ssv import XMLToSSV
 from ssv_to_xml import SSVToXML
 
 
-worker_connectors = {
-                     "stdio" : WorkerStdio,
-                     "socket" : WorkerSocket 
-                     }
 
 class Manager(object):
     '''
@@ -31,9 +27,14 @@ class Manager(object):
     '''
     def __init__(self, config):
         
-        self.worker_config=config.worker()
+        worker_connectors = {
+                     "stdio" : WorkerStdio,
+                     "socket" : WorkerSocket 
+                            }
+
+        self.worker_config=config.worker 
         self.command=self.worker_config.get("main","command","")
-        self.socket_mgr=socket_mgr.SocketMgr(self.worker_config)
+        self.socket_mgr=tcp_socket.SocketMgr(config)
         self.running=False 
         self.log=logging.getLogger("log")
         self.datalog=logging.getLogger("datalog")

@@ -10,10 +10,10 @@ from collections import OrderedDict
 class WorkerConfig(object):
     
     """ 
-    holds config data for the worker section
+    holds items data for the worker section
     """
     
-    def __init__(self, name, params, configdata):
+    def __init__(self, config, name, params, configdata):
         
         self.subsection_classes = {
             "main"          : WorkerMainConfig, 
@@ -21,12 +21,13 @@ class WorkerConfig(object):
             "message"       : WorkerMessageConfig,
             "encapsulation" : WorkerEncapsulationConfig
                                   }
-        # get and store the worker section config data 
-        self.config={}
+        # get and store the worker section items data 
+        self.config=config
+        self.items={}
         config_sections=configbase.get_sections(configdata)
         
         for section,data in config_sections.iteritems():
-            self.config[section]=self.subsection_classes[section](data)
+            self.items[section]=self.subsection_classes[section](data)
             
         self.conn_type=params[0]
         self.conn_dir=params[1]
@@ -35,9 +36,9 @@ class WorkerConfig(object):
     def get(self, section, item, default):
         
        
-        if section in self.config:
-            if item in self.config[section].items:
-                return self.config[section][item]
+        if section in self.items:
+            if item in self.items[section].items:
+                return self.items[section][item]
             elif default==None:
                 raise StandardError("Config worker section : subsection %s : item %s not found " % (section, item))
         elif default==None:
@@ -47,9 +48,9 @@ class WorkerConfig(object):
                    
     #---------------------------------------------------------------------------------------------------------------------
     def check(self):
-        # ensure all messages listed in the worker section have definitions in the message config sections 
-        for k in self.config["message"].messages:
-            if not xmlconfig.XMLMessageConfig.check_message_defined(k):
+        # ensure all messages listed in the worker section have definitions in the message items sections 
+        for k in self.items["message"].messages:
+            if not self.config.check_message_defined(k):
                 raise LookupError("Config line %s : message type %s is not defined " % (self.messages[k],k))
             
             

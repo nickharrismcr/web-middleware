@@ -6,7 +6,7 @@ Created on 9 Jul 2017
 
 import logging,sys 
 
-# this bypasses the @trace decorator code if False, but @trace decorators should be commented out in release code
+# this bypasses the @trace decorator code if False, but @trace trace_decorator should be commented out in release code
 
 DEBUGMODE=False 
 

@@ -6,11 +6,11 @@ Created on 7 Jul 2017
  
 from collections import OrderedDict
 from workerconfig import WorkerConfig
-import configbase, xmlconfig
+import  xmlconfig,configbase
 import re
 
 re_section = re.compile("^\[.*\]")
-
+ 
 
 class Config:
 
@@ -22,7 +22,7 @@ class Config:
     RESPONSE=2 
     
     def __init__(self, p_file):
-        
+ 
         # for each config section, instantiate and populate a relevant config object 
         
         self.config_classes={ 
@@ -36,7 +36,6 @@ class Config:
         self.block=[]
         self.curr_section=""
         self.curr_params=[]
-        
 
         for number, line in enumerate(self.data):
              
@@ -46,7 +45,7 @@ class Config:
             if re_section.search(line)!=None:
                 if self.curr_section != "":
                     
-                    config_obj=self.config_classes[self.curr_section](self.curr_section,self.curr_params, self.block )
+                    config_obj=self.config_classes[self.curr_section](self, self.curr_section,self.curr_params, self.block )
                     self.configs[self.curr_section]=config_obj
  
                 self.block=[]
@@ -57,11 +56,13 @@ class Config:
             else:
                 self.block.append((number+1,line[:-1]))
                 
-        config_obj=self.config_classes[self.curr_section](self.curr_section, self.curr_params, self.block )
+        config_obj=self.config_classes[self.curr_section](self, self.curr_section, self.curr_params, self.block )
         self.configs[self.curr_section]=config_obj
         
         self.configs["worker"].check()
-    
+        
+        
+    @property
     def worker(self):
         return self.configs["worker"]
     
@@ -80,6 +81,15 @@ class Config:
     @property
     def conn_dir(self):
         return self.configs["worker"].conn_dir 
+    
+    def get_xmlconfig(self,message):
+        return self.configs["xmlmessage"].get_config(message)
+    
+    def get_xmlrepeatconfig(self,message):
+        return self.configs["xmlrepeat"].get_config(message)
+    
+    def check_message_defined(self,message):
+        return self.configs["xmlmessage"].check_message_defined(message)
     
     def __str__(self):
         

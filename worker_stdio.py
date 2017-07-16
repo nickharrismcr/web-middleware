@@ -8,10 +8,8 @@ import subprocess,logging
  
 
 class WorkerStdio(object):
-    '''
-    classdocs
-    '''
-
+    
+    ''' communicate with a stdio worker process '''
 
     def __init__(self, config):
         '''
@@ -34,9 +32,9 @@ class WorkerStdio(object):
         
         if translator:
             msg=self.pipe.stdout.readline().strip()
-            self.datalog.info("Received from worker :\n"+msg)
+            self.datalog.info("Received from worker : \n%s \n" % msg)
             translated_msg=translator.convert(msg)
-            self.datalog.info("Sent translated data :\n"+translated_msg)
+            self.datalog.info("Sent translated data :\n%s \n" % translated_msg)
             return translated_msg 
             
     def send(self, resp):

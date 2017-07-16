@@ -6,6 +6,9 @@ Created on 13 Jul 2017
 
 import   socket, SocketServer , logging
 
+import config 
+
+
 DIR_REQ=0
 DIR_RESP=1
 
@@ -49,22 +52,23 @@ class MyTCPServer(SocketServer.TCPServer):
         
 class SocketMgr(object):
     '''
-    manage remote host connections
+    manage tcp remote host connections
     for worker sink mode, run a SocketServer
     '''
 
-    def __init__(self,worker_config):
+    def __init__(self,config):
     
-        self.config=worker_config 
+        self.items=config.worker
+        print self.items
         self.socket=None
-        self.type=self.config.conn_dir    #source|sink 
+        self.type=self.items.conn_dir    #source|sink 
         if self.type=="source":
-            self.ipaddr=(self.config.get("main","remoteserver",None))
-            self.port=int(self.config.get("main","remoteport",None))
+            self.ipaddr=(self.items.get("main","remoteserver",None))
+            self.port=int(self.items.get("main","remoteport",None))
         elif self.type=="sink":
-            self.port=int(self.config.get("transport","port",None))
+            self.port=int(self.items.get("transport","port",None))
         self.log=logging.getLogger("log")
-
+        self.datalog=logging.getLogger("datalog")
     
     def listen(self, manager, handler_class, request_converter, response_converter ):
 
@@ -115,9 +119,9 @@ class SocketMgr(object):
             raise 
  
         self.disconnect()
-        self.datalog.info("Received response : \n"+resp) 
+        self.datalog.info("Received response : \n%s \n" % resp) 
         translated_resp=translator.convert(resp)
-        self.datalog.info("Translated response : \n"+translated_resp)    
+        self.datalog.info("Translated response : \n%s \n" % translated_resp)    
 
         return translated_resp
     

@@ -28,7 +28,7 @@ class XMLMessageConfig():
     # class level dict of message types 
     xml_messages = OrderedDict()
  
-    def __init__(self, name,  params, configdata):
+    def __init__(self, config, name,  params, configdata):
         
         config_sections=configbase.get_sections(configdata)
         
@@ -45,7 +45,7 @@ class XMLMessageConfig():
                 else:
                     lineclass=classlookup[which]
                     if lineclass:
-                        self.request_elems.append(lineclass(n,what))
+                        self.request_elems.append(lineclass(config, n,what))
         
                 
         if "reply" in config_sections:
@@ -56,7 +56,7 @@ class XMLMessageConfig():
                 else:
                     lineclass=classlookup[which]
                     if lineclass:
-                        self.response_elems.append(lineclass(n,what))
+                        self.response_elems.append(lineclass(config, n,what))
                
                     
         self.xml_messages[params[0]]=self
@@ -96,7 +96,7 @@ class XMLRepeatConfig():
     # class level dict of repeat config types 
     xml_repeats = OrderedDict()
     
-    def __init__(self, name, params, configdata):
+    def __init__(self, config, name, params, configdata):
          
         config_sections=configbase.get_sections(configdata)
         self.xml_repeats[params[0]]=self
@@ -112,14 +112,14 @@ class XMLRepeatConfig():
                 else:
                     lineclass=classlookup[which]
                     if lineclass:
-                        self.elems.append(lineclass(n,what))
+                        self.elems.append(lineclass(config, n,what))
   
     
     def get_elems(self):
         return self.elems                    
                 
     @classmethod
-    def get_xml_repeat_config(cls,name):
+    def get_config(cls,name):
         # get the XMLRepeatConfig object for the given name, referred to in message repeat elements 
         if name in cls.xml_repeats:
             return cls.xml_repeats[name]

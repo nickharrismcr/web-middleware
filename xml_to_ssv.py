@@ -17,7 +17,7 @@ class XMLToSSV:
     def __init__(self,config,direction):
         
         self.direction=direction
-        self.config=config
+        self.items=config
         self.messagetypes={}
         delim_elem="todelimiter" if direction == config.REQUEST else "fromdelimiter"
         self.delim=config.worker_item("main",delim_elem,",")
@@ -44,12 +44,12 @@ class XMLToSSV:
         mc=xmlconfig.XMLMessageConfig.get_config(messagetype)    
         _, _req_elements, _resp_elements =(mc.value_count, mc.get_request_elems(), mc.get_response_elems())
         
-        if self.direction==self.config.REQUEST:
+        if self.direction==self.items.REQUEST:
             msg_elements=_req_elements
         else:
             msg_elements=_resp_elements 
  
-        # for each xml element defined in the config, search the input xml tree for a matching path and get the value there
+        # for each xml element defined in the items, search the input xml tree for a matching path and get the value there
         if msg_elements != []:
             
             for elem in msg_elements:      
@@ -73,46 +73,10 @@ class XMLToSSV:
     #-----------------------------------------------------------------------------------------------                  
     def addto_ssv(self,rootnode, elem, lssv, offset=0 ): 
             
-        # each config element type queries the input xml tree in its own way 
-           
-        if isinstance(elem,configbase.ConfigAttribute):
-            
-            lssv[elem.ssv_col+offset]=""
-            node=ETF.get_node_at_path(rootnode,elem.path)
-            if node != None:
-                if elem.attribute in node.attrib:
-                    lssv[elem.ssv_col+offset]=node.attrib[elem.attribute]
-            
-        elif isinstance(elem,configbase.ConfigElement):
-            
-            lssv[elem.ssv_col+offset]=""
-            node=ETF.get_node_at_path(rootnode,elem.path)
-            if node != None:
-                lssv[elem.ssv_col+offset]=node.text
-            
-        elif isinstance(elem,configbase.ConfigRepeat):
-            
-            ssv_col_for_repeat = elem.ssv_col
-            ssv_col_for_items = elem.startcol 
-            
-            tempssv=OrderedDict()
-            
-            repeatroot=ETF.get_node_at_path(rootnode, elem.path)                  
-            rc=xmlconfig.XMLRepeatConfig.get_xml_repeat_config(elem.xmlrepeatconfigname)
-            vals=rc.value_count
-            repeatcount=0
-            for child in repeatroot:
-               
-                for elem in rc.get_elems():
-                    target=ETF.get_node_at_path(child,elem.path)
-                    if target <> None:
-                        self.addto_ssv(target,elem,tempssv,vals*repeatcount)
-                repeatcount+=1
-                
-            lssv[ssv_col_for_repeat]=repeatcount
-            lssv[ssv_col_for_items]=tempssv 
-            
- 
+        # each items element type queries the input xml tree in its own way 
+        elem.addto_ssv(rootnode,lssv,offset)
+        
+       
 
     #-----------------------------------------------------------------------------------------------        
     def error(self):
