@@ -18,6 +18,7 @@ class WorkerStdio(object):
         Constructor
         '''
         self.log=logging.getLogger("log")
+        self.datalog=logging.getLogger("datalog")
     
     def start_worker(self, command ):
         
@@ -29,10 +30,15 @@ class WorkerStdio(object):
         
         return True
         
-    def read(self):
+    def read(self,translator=None):
         
-        return self.pipe.stdout.readline().strip()
-        
+        if translator:
+            msg=self.pipe.stdout.readline().strip()
+            self.datalog.info("Received from worker :\n"+msg)
+            translated_msg=translator.convert(msg)
+            self.datalog.info("Sent translated data :\n"+translated_msg)
+            return translated_msg 
+            
     def send(self, resp):
         
         self.pipe.stdin.write(resp)

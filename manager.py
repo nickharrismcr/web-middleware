@@ -20,12 +20,19 @@ worker_connectors = {
 
 class Manager(object):
     '''
-    classdocs
+    start the worker. set up a processing chain :
+        worker = source :
+            poll worker for requests :
+                translate request, send to remote host, translate response, send to worker
+        worker = sink :
+            set up TCPServer to handle requests from remote host:
+                translate request, send to worker, translate response, send response to remote host 
+            
     '''
     def __init__(self, config):
         
-        self.worker_config=config.get_worker_config()
-        self.command=self.worker_config.get_config_item("main","command","")
+        self.worker_config=config.worker()
+        self.command=self.worker_config.get("main","command","")
         self.socket_mgr=socket_mgr.SocketMgr(self.worker_config)
         self.running=False 
         self.log=logging.getLogger("log")
@@ -59,24 +66,11 @@ class Manager(object):
         
         self.log.info("Polling worker")
         while ( self.running == True ):
-            req=self.worker_connector.read()  
-            self.datalog.info("Received worker request :\n"+req)
-            translated_req=self.request_converter.convert_request(req)
-            self.datalog.info("Sent translated data :\n"+translated_req)
-            try:
-                self.socket_mgr.sendto_server(translated_req)
-                resp=self.socket_mgr.readfrom_server()
-                self.datalog.info("Received response : \n"+resp)
-                if len(resp)>1:
-                    translated_resp=self.response_converter.convert_request(resp)
-                    self.datalog.info("Sent translated response to worker \n"+translated_resp)
-                    self.worker_connector.send(translated_resp+"\n")
-                else:
-                    self.datalog.error("No response from remote server")
-            except IOError,e:
-                self.datalog.error("No response from remote server")
-                self.log.error("Error connecting to remote host : "+str(e))
-                self.worker_connector.send(self.response_converter.error())
+            translated_req=self.worker_connector.read(translator=self.request_converter)  
+            self.socket_mgr.sendto_server(translated_req)
+            translated_resp=self.socket_mgr.readfrom_server(translator=self.response_converter)
+            self.worker_connector.send(translated_resp+"\n")
+
         
     def poll_socket(self):
         
@@ -86,21 +80,15 @@ class Manager(object):
 
                 #print >> sys.stderr, "handler log : "+str(self.server.log)
                 self.server.log.info("Connection from %s %s " % self.client_address)
-                req=self.server.readmsg(self.request)
-                self.server.datalog.info("Received request :\n"+req)
-                translated_req=self.server.manager.request_converter.convert_request(req)
-                self.server.datalog.info("Translated request : \n"+translated_req)
+                translated_req=self.server.readmsg(self.request,self.server.request_converter) 
                 self.server.manager.worker_connector.send(translated_req+"\n")
-                resp=self.server.manager.worker_connector.read()
-                self.server.datalog.info("Worker responded \n"+resp)
-                translated_resp=self.server.manager.response_converter.convert_request(resp)
-                self.server.datalog.info("Sent translated response\n"+translated_resp)
+                translated_resp=self.server.manager.worker_connector.read(translator=self.server.response_converter) 
                 self.request.sendall(translated_resp) 
                 self.request.shutdown(socket.SHUT_RDWR)
-                #self.server.shutdown()
-                               
 
-        self.socket_mgr.listen(self,MyTCPHandler)
+                #self.server.shutdown()
+         
+        self.socket_mgr.listen(self,MyTCPHandler,self.request_converter,self.response_converter)
 
     def stop(self):
         

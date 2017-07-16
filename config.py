@@ -7,7 +7,6 @@ Created on 7 Jul 2017
 from collections import OrderedDict
 from workerconfig import WorkerConfig
 import configbase, xmlconfig
-import log
 import re
 
 re_section = re.compile("^\[.*\]")
@@ -63,18 +62,24 @@ class Config:
         
         self.configs["worker"].check()
     
-    def get_worker_config(self):
+    def worker(self):
         return self.configs["worker"]
     
-    def get_worker_config_item(self,section, what,default):
+    def worker_item(self,section, what,default):
         # proxy for retrieving a worker config item 
-        return self.configs["worker"].get_config_item(section, what,default)
+        return self.configs["worker"].get(section, what,default)
     
-    def get_logfilename(self):
-        return self.configs["worker"].get_config_item("main","log", "webmw.log")
+    @property
+    def logfilename(self):
+        return self.configs["worker"].get("main","log", "webmw.log")
 
-    def get_datalogfilename(self):
-        return self.configs["worker"].get_config_item("main", "datalog", "webmw.data.log")
+    @property
+    def datalogfilename(self):
+        return self.configs["worker"].get("main", "datalog", "webmw.data.log")
+    
+    @property
+    def conn_dir(self):
+        return self.configs["worker"].conn_dir 
     
     def __str__(self):
         

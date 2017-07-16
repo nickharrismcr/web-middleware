@@ -22,13 +22,13 @@ class SSVToXML:
         self.direction=direction
         self.messagetypes={}
         delim_elem="todelimiter" if direction == config.REQUEST else "fromdelimiter"
-        self.delim=config.get_worker_config_item("main",delim_elem,",")
+        self.delim=config.worker_item("main",delim_elem,",")
         messageID_elem = "messageID" if direction==config.REQUEST else "replymessageID"
-        self.messageIDpath=config.get_worker_config_item("message",messageID_elem,None) 
+        self.messageIDpath=config.worker_item("message",messageID_elem,None) 
         
     #-----------------------------------------------------------------------------------------------        
     @trace("debug")
-    def convert_request(self, ssv):
+    def convert(self, ssv):
         
         if not self.delim in ssv:
             raise StandardError("Invalid input line : No delimiter found : %s ", ssv )

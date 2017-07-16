@@ -22,7 +22,7 @@ def init(config):
     
     console=logging.StreamHandler(stream=sys.stdout)
     console.setFormatter(formatter)
-    lfile=logging.FileHandler(config.get_logfilename())
+    lfile=logging.FileHandler(config.logfilename)
     lfile.setFormatter(formatter)
     
     log.addHandler(console)
@@ -33,7 +33,7 @@ def init(config):
     
     dconsole=logging.StreamHandler(stream=sys.stdout)
     dconsole.setFormatter(formatter)
-    dfile=logging.FileHandler(config.get_datalogfilename())
+    dfile=logging.FileHandler(config.datalogfilename)
     dfile.setFormatter(formatter)
     
     datalog.addHandler(dconsole)

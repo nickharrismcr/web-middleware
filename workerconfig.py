@@ -32,7 +32,7 @@ class WorkerConfig(object):
         self.conn_dir=params[1]
 
     #---------------------------------------------------------------------------------------------------------------------                    
-    def get_config_item(self, section, item, default):
+    def get(self, section, item, default):
         
        
         if section in self.config:

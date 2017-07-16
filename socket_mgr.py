@@ -5,32 +5,52 @@ Created on 13 Jul 2017
 '''
 
 import   socket, SocketServer , logging
- 
+
+DIR_REQ=0
+DIR_RESP=1
+
  
 class MyTCPServer(SocketServer.TCPServer):
     
-    def __init__(self, server_address, RequestHandlerClass, manager):
+    '''tcpserver class with some extra references to  manager, converters and log objects  '''
+    
+    def __init__(self, server_address, RequestHandlerClass, manager, request_converter, response_converter ):
         
         SocketServer.TCPServer.__init__(self, server_address,RequestHandlerClass, bind_and_activate=False)
         self.manager=manager 
+        self.request_converter=request_converter
+        self.response_converter=response_converter 
         self.log=logging.getLogger("log")
         self.datalog=logging.getLogger("datalog")
         
-       
-
-    def readmsg(self,conn):
+    def readmsg(self,conn,converter):
+        
+        ''' read and translate a message from the remote server
+           called in handler handle method 
+        ''' 
+         
         resp=""
-        while 1:
-            data=conn.recv(1024).strip()
-            if not data:
-                break
-            resp+=data 
-        return resp 
-
+        try:
+            while 1:
+                data=conn.recv(1024)
+                if not data:
+                    break
+                resp+=data
+        except IOError,e:
+            self.datalog.error("Could not read from remote server")
+            self.log.error("Error connecting to remote host : "+str(e))
+            raise 
+  
+        self.datalog.info("Received : \n"+resp) 
+        translated_resp=converter.convert(resp)  
+        self.datalog.info("Translated message : \n"+translated_resp)    
+    
+        return translated_resp
+        
 class SocketMgr(object):
     '''
-    manage external connections
-    for worker sink mode, run a SocketServer 
+    manage remote host connections
+    for worker sink mode, run a SocketServer
     '''
 
     def __init__(self,worker_config):
@@ -39,19 +59,20 @@ class SocketMgr(object):
         self.socket=None
         self.type=self.config.conn_dir    #source|sink 
         if self.type=="source":
-            self.ipaddr=(self.config.get_config_item("main","remoteserver",None))
-            self.port=int(self.config.get_config_item("main","remoteport",None))
+            self.ipaddr=(self.config.get("main","remoteserver",None))
+            self.port=int(self.config.get("main","remoteport",None))
         elif self.type=="sink":
-            self.port=int(self.config.get_config_item("transport","port",None))
+            self.port=int(self.config.get("transport","port",None))
         self.log=logging.getLogger("log")
 
     
-    def listen(self, manager, handler_class ):
+    def listen(self, manager, handler_class, request_converter, response_converter ):
 
-        # manager is a reference to the calling Manager object
+        # start TCPServer for remote connections. manager is a reference to the calling Manager object
+        
         self.log.info("Starting server on %s : %s " % ("localhost", self.port))
  
-        self.server = MyTCPServer(("localhost", self.port), handler_class, manager  )
+        self.server = MyTCPServer(("localhost", self.port), handler_class, manager, request_converter, response_converter   )
         self.server.allow_reuse_address=True
         self.server.server_bind()
         self.server.server_activate()
@@ -76,17 +97,29 @@ class SocketMgr(object):
         self.connect()
         self.socket.sendall(request)
 
-    def readfrom_server(self):       
-        
+    def readfrom_server(self, translator=None):       
+           
         resp=""
-        while 1:
-            data=self.socket.recv(1024)
-            if not data:
-                break
-            resp+=data
-        
+        try:
+            while 1:
+                data=self.socket.recv(1024)
+                if not data:
+                    break
+                resp+=data
+                
+        except IOError,e:
+            
+            self.disconnect()
+            self.datalog.error("No response from remote host")
+            self.log.error("Error connecting to remote host : "+str(e))
+            raise 
+ 
         self.disconnect()
-        return resp
+        self.datalog.info("Received response : \n"+resp) 
+        translated_resp=translator.convert(resp)
+        self.datalog.info("Translated response : \n"+translated_resp)    
+
+        return translated_resp
     
  
  

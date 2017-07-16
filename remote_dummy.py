@@ -33,11 +33,11 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         ok=True
         while ( ok ):
             self.data = self.request.recv(1024).strip()
-            print >>log, "dummy server recv : "+self.data 
+            #print >>log, "dummy server recv : "+self.data 
             if "</body>" in self.data.split("\n") :
                     self.request.sendall(smallmsg)
                     ok=False 
-                    print >>log, "dummy server send : "+smallmsg 
+                    #print >>log, "dummy server send : "+smallmsg 
                     break 
 
 
@@ -91,7 +91,7 @@ def run_dummy_client():
 </body>'''
         time.sleep(1.5)
         HOST, PORT = "localhost", 2468 
-        print >> log, "Remote client connecting to remote host %s : %s " % ((HOST,PORT))
+        #print >> log, "Remote client connecting to remote host %s : %s " % ((HOST,PORT))
         try:
             sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -101,7 +101,7 @@ def run_dummy_client():
             print >> log, "Remote client : "+str(e)
             return 
         
-        print >> log, "Remote client sending msg "
+        #print >> log, "Remote client sending msg "
         sock.sendall(msg)
         sock.shutdown(socket.SHUT_WR)
         
@@ -112,7 +112,7 @@ def run_dummy_client():
                 break
             resp+=data 
  
-        print >>log,"remote client read response : "+resp
+        #print >>log,"remote client read response : "+resp
         sock.shutdown(socket.SHUT_RD)
         sock.close()
        

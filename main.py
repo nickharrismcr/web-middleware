@@ -5,9 +5,7 @@ Created on 7 Jul 2017
 
 TODO : 
 
- 
-communicate with a worker 
-transports
+transports/encapsulations 
 
 '''
 
@@ -35,7 +33,7 @@ def main():
     myconfig=config.Config("test.cfg")
     log.init(myconfig)
  
-    if myconfig.get_worker_config().conn_dir=="source":
+    if myconfig.conn_dir=="source":
         th=multiprocessing.Process(target=remote_dummy.run_dummy_server)
     else:
         th=multiprocessing.Process(target=remote_dummy.run_dummy_client)

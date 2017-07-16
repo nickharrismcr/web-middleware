@@ -14,8 +14,8 @@ print >> log, "worker started"
 while [ 1 == 1 ]:
     
     inp=sys.stdin.readline()
-    print >>log, "stdio sink worker : read request" , inp
+    #print >>log, "stdio sink worker : read request" , inp
     sys.stdout.write( "TST|resp|resp2|resp3\n" )
-    print >>log, "stdio sink worker : sent response TST|resp|resp2|resp3" 
+    #print >>log, "stdio sink worker : sent response TST|resp|resp2|resp3" 
 
     

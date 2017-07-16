@@ -20,12 +20,12 @@ class XMLToSSV:
         self.config=config
         self.messagetypes={}
         delim_elem="todelimiter" if direction == config.REQUEST else "fromdelimiter"
-        self.delim=config.get_worker_config_item("main",delim_elem,",")
+        self.delim=config.worker_item("main",delim_elem,",")
         messageID_elem = "messageID" if direction==config.REQUEST else "replymessageID"
-        self.messageIDpath=config.get_worker_config_item("message", messageID_elem, None)
+        self.messageIDpath=config.worker_item("message", messageID_elem, None)
          
     #-----------------------------------------------------------------------------------------------        
-    def convert_request(self, xml):
+    def convert(self, xml):
         
         lssv={}
         
