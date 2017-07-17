@@ -62,12 +62,11 @@ class Config:
         
         self.configs["worker"].check()
         
-        
     @property
     def worker(self):
         return self.configs["worker"]
     
-    def worker_item(self,section, what,default):
+    def get(self,section, what,default):
         # proxy for retrieving a worker config item 
         return self.configs["worker"].get(section, what,default)
     

@@ -13,9 +13,9 @@ DIR_REQ=0
 DIR_RESP=1
 
  
-class MyTCPServer(SocketServer.TCPServer):
+class MyHTTPServer(SocketServer.TCPServer):
     
-    '''tcpserver class with some extra references to  manager, converters and log objects  '''
+    '''tcpserver class with some extra references to  application, converters and log objects  '''
     
     def __init__(self, server_address, RequestHandlerClass, manager, request_converter, response_converter ):
         
@@ -50,7 +50,7 @@ class MyTCPServer(SocketServer.TCPServer):
     
         return translated_resp
         
-class SocketMgr(object):
+class HTTPSocket(object):
     '''
     manage tcp remote host connections
     for worker sink mode, run a SocketServer
@@ -72,7 +72,7 @@ class SocketMgr(object):
     
     def listen(self, manager, handler_class, request_converter, response_converter ):
 
-        # start TCPServer for remote connections. manager is a reference to the calling Manager object
+        # start TCPServer for remote connections. application is a reference to the calling Manager object
         
         self.log.info("Starting server on %s : %s " % ("localhost", self.port))
  

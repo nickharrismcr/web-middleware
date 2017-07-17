@@ -15,14 +15,14 @@ from multiprocessing import freeze_support
 import log
 import config 
 import remote_dummy
-from manager import Manager  
+from application import Application  
 
 
 def handler(signum, frame):
     
-    global mgr
+    global app
     logging.getLogger("log").critical("SIGTERM signal reoeived. stopping worker")
-    mgr.stop()
+    app.stop()
     exit()
    
 def main():
@@ -39,10 +39,9 @@ def main():
         th=multiprocessing.Process(target=remote_dummy.run_dummy_client)
     th.start()
     
-    mgr=Manager(myconfig)
-    mgr.start_worker()
-    mgr.poll()
-    mgr.stop()
+    app=Application(myconfig)
+    app.poll()
+    app.stop()
     th.terminate() 
 
 if __name__=="__main__":

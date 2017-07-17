@@ -89,7 +89,7 @@ class WorkerTransportConfig(object):
    
         self.items=OrderedDict()
         params,block=data 
-        self.type=params[0]
+        self.items["type"]=params[0]
         
         readers={}
         
@@ -140,7 +140,7 @@ class WorkerEncapsulationConfig(object):
         
         self.items=OrderedDict()
         params,block=data 
-        self.type=params[0]
+        self.items["type"]=params[0]
         
         readers={}
         
