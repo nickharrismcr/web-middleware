@@ -8,15 +8,15 @@ each holds a dict of ConfigElement etc. objects,  one per config line
 '''
 
 from collections import OrderedDict
-import configbase
+import config_base
  
 
 
-classlookup = {     "element" :           configbase.ConfigElement ,
-                    "attribute" :         configbase.ConfigAttribute ,
-                    "staticElement" :     configbase.ConfigStaticElement ,
-                    "staticAttribute" :   configbase.ConfigStaticAttribute ,
-                    "repeat" :            configbase.ConfigRepeat,
+classlookup = {     "element" :           config_base.ConfigElement ,
+                    "attribute" :         config_base.ConfigAttribute ,
+                    "staticElement" :     config_base.ConfigStaticElement ,
+                    "staticAttribute" :   config_base.ConfigStaticAttribute ,
+                    "repeat" :            config_base.ConfigRepeat,
                     "messageid" :         None }
 
 class XMLMessageConfig():
@@ -30,7 +30,7 @@ class XMLMessageConfig():
  
     def __init__(self, config, name,  params, configdata):
         
-        config_sections=configbase.get_sections(configdata)
+        config_sections=config_base.get_sections(configdata)
         
         self.request_elems=[]
         self.response_elems=[]
@@ -98,7 +98,7 @@ class XMLRepeatConfig():
     
     def __init__(self, config, name, params, configdata):
          
-        config_sections=configbase.get_sections(configdata)
+        config_sections=config_base.get_sections(configdata)
         self.xml_repeats[params[0]]=self
         self.elems=[]
         self.repeattag=""

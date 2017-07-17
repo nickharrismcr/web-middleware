@@ -4,7 +4,8 @@ Created on 14 Jul 2017
 @author: nick
 '''
 
-import configbase, xmlconfig
+import config_base
+import config_xml
 from collections import OrderedDict
 
 class WorkerConfig(object):
@@ -24,7 +25,7 @@ class WorkerConfig(object):
         # get and store the worker section items data 
         self.config=config
         self.items={}
-        config_sections=configbase.get_sections(configdata)
+        config_sections=config_base.get_sections(configdata)
         
         for section,data in config_sections.iteritems():
             self.items[section]=self.subsection_classes[section](data)
@@ -63,17 +64,17 @@ class WorkerMainConfig(object):
         self.items=OrderedDict()
         params,block=data 
         readers={
-               "fromdelimiter" :    configbase.read_delimiter,
-               "todelimiter" :      configbase.read_delimiter,
-               "fromterminator" :   configbase.read_delimiter,
-               "toterminator" :     configbase.read_delimiter
+               "fromdelimiter" :    config_base.read_delimiter,
+               "todelimiter" :      config_base.read_delimiter,
+               "fromterminator" :   config_base.read_delimiter,
+               "toterminator" :     config_base.read_delimiter
                }
         
         for n,l in block:
             try:
                 what=l.split("=")[0]
                 which=l.split("=")[1]
-                self.items[what]=configbase.read_config(readers,what,which) 
+                self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
                 raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
 
@@ -96,7 +97,7 @@ class WorkerTransportConfig(object):
             try:
                 what=l.split("=")[0]
                 which=l.split("=")[1]
-                self.items[what]=configbase.read_config(readers,what,which) 
+                self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
                 raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
 
@@ -114,8 +115,8 @@ class WorkerMessageConfig(object):
         self.type=params[0]
         
         readers={
-               "messageID" :        configbase.read_message_id,
-               "replymessageID" :   configbase.read_message_id,
+               "messageID" :        config_base.read_message_id,
+               "replymessageID" :   config_base.read_message_id,
               } 
         
         for n,l in block:
@@ -125,7 +126,7 @@ class WorkerMessageConfig(object):
                 if what=="message":
                     self.messages.append(which)
                 else:
-                    self.items[what]=configbase.read_config(readers,what,which) 
+                    self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
                 raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
             
@@ -147,7 +148,7 @@ class WorkerEncapsulationConfig(object):
             try:
                 what=l.split("=")[0]
                 which=l.split("=")[1]
-                self.items[what]=configbase.read_config(readers,what,which) 
+                self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
                 raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
             

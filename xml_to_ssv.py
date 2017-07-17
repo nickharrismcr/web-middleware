@@ -3,7 +3,9 @@ Created on 7 Jul 2017
 
 @author: nick
 '''
-import  xmlconfig, configbase, config
+import config
+import config_base
+import config_xml
 import xml.etree.ElementTree as ET
 import etree_fns as ETF
 from collections import OrderedDict
@@ -41,7 +43,7 @@ class XMLToSSV:
         else:
             raise StandardError("No message type") 
         
-        mc=xmlconfig.XMLMessageConfig.get_config(messagetype)    
+        mc=config_xml.XMLMessageConfig.get_config(messagetype)    
         _, _req_elements, _resp_elements =(mc.value_count, mc.get_request_elems(), mc.get_response_elems())
         
         if self.direction==self.items.REQUEST:

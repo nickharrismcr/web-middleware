@@ -3,7 +3,7 @@ Created on 7 Jul 2017
 
 @author: nick
 '''
-import xmlconfig
+import config_xml
 import config 
 import xml.etree.ElementTree as ET 
 import etree_fns as ETF

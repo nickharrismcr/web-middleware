@@ -5,8 +5,9 @@ Created on 7 Jul 2017
 '''
  
 from collections import OrderedDict
-from workerconfig import WorkerConfig
-import  xmlconfig,configbase
+from config_worker import WorkerConfig
+import config_base
+import config_xml
 import re
 
 re_section = re.compile("^\[.*\]")
@@ -27,8 +28,8 @@ class Config:
         
         self.config_classes={ 
                         "worker"     : WorkerConfig ,
-                        "xmlmessage" : xmlconfig.XMLMessageConfig, 
-                        "xmlrepeat"  : xmlconfig.XMLRepeatConfig
+                        "xmlmessage" : config_xml.XMLMessageConfig, 
+                        "xmlrepeat"  : config_xml.XMLRepeatConfig
                       } 
         
         self.data=[ i for i in open(p_file,"r")]
@@ -49,7 +50,7 @@ class Config:
                     self.configs[self.curr_section]=config_obj
  
                 self.block=[]
-                s=configbase.get_section(line)  
+                s=config_base.get_section(line)  
                 self.curr_section=s[0] 
                 self.curr_params=s[1:]
             
@@ -94,7 +95,7 @@ class Config:
     def __str__(self):
         
         out=str(self.configs["worker"])
-        out+="\n"+xmlconfig.XMLMessageConfig.list_messages()
+        out+="\n"+config_xml.XMLMessageConfig.list_messages()
         return out
     
 #---------------------------------------------------------------------------------------------------------------------                    
