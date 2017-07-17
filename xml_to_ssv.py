@@ -3,12 +3,10 @@ Created on 7 Jul 2017
 
 @author: nick
 '''
-import config
-import config_base
+
 import config_xml
 import xml.etree.ElementTree as ET
 import etree_fns as ETF
-from collections import OrderedDict
          
 class XMLToSSV:
     
@@ -34,26 +32,19 @@ class XMLToSSV:
         try:
             rootnode=ET.fromstring(xml)
         except:
-            raise StandardError("Invalid input xml : \n %s ", xml )
- 
+            raise StandardError("Invalid input XML : \n %s ", xml )
  
         messagetypenode=ETF.get_node_at_path(rootnode, self.messageIDpath)
         if messagetypenode <> None:
             messagetype=messagetypenode.text 
         else:
-            raise StandardError("No message type") 
+            raise StandardError("No message type element in XML") 
         
         mc=config_xml.XMLMessageConfig.get_config(messagetype)    
-        _, _req_elements, _resp_elements =(mc.value_count, mc.get_request_elems(), mc.get_response_elems())
-        
-        if self.direction==self.items.REQUEST:
-            msg_elements=_req_elements
-        else:
-            msg_elements=_resp_elements 
+        msg_elements = mc.get_request_elems() if self.direction==self.items.REQUEST else mc.get_response_elems()
  
         # for each xml element defined in the items, search the input xml tree for a matching path and get the value there
         if msg_elements != []:
-            
             for elem in msg_elements:      
                 self.addto_ssv(rootnode, elem, lssv )
         
@@ -68,17 +59,13 @@ class XMLToSSV:
                 out.append(str(i))  
         
         rv=self.delim.join(out)
- 
         return rv
-    
     
     #-----------------------------------------------------------------------------------------------                  
     def addto_ssv(self,rootnode, elem, lssv, offset=0 ): 
             
         # each items element type queries the input xml tree in its own way 
         elem.addto_ssv(rootnode,lssv,offset)
-        
-       
 
     #-----------------------------------------------------------------------------------------------        
     def error(self):

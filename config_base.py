@@ -85,9 +85,9 @@ def read_config(readers, what, data):
 #---------------------------------------------------------------------------------------------------------------------      
 #---------------------------------------------------------------------------------------------------------------------       
 #---------------------------------------------------------------------------------------------------------------------       
-# classes for message config elements.  all have methods for getting text content of their 
-# specified xml node from the passed in tree and adding it to the ssv list, and getting an ssv line value 
-# and creating an xml node on the passed in tree containing it as text. 
+# classes for message config elements.  all have methods for 
+# * getting text content of their specified xml node from the passed in tree and adding it to the ssv list, 
+# * getting an ssv list value and creating an xml node on the passed in tree containing it as text. 
               
 class ConfigElement(object): 
     

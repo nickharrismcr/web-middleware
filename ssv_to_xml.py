@@ -3,20 +3,17 @@ Created on 7 Jul 2017
 
 @author: nick
 '''
-import config_xml
-import config 
+
 import xml.etree.ElementTree as ET 
 import etree_fns as ETF
 
 from trace_decorator import trace 
-
              
 class SSVToXML:
     
     """ 
     convert ssv input for a specific message type to XML using the relevant XMLMessageConfig and XMLRepeatConfig objects
     """ 
-    
     
     def __init__(self,config,direction):
  
@@ -39,12 +36,8 @@ class SSVToXML:
         messagetype=lssv[0]
         
         mc=self.items.get_xmlconfig(messagetype)    
-        _, _req_elements, _resp_elements  =(mc.value_count, mc.get_request_elems(), mc.get_response_elems())
-        if self.direction==self.items.REQUEST:
-            msg_elements=_req_elements
-        else:
-            msg_elements=_resp_elements 
-        
+        msg_elements = mc.get_request_elems() if self.direction==self.items.REQUEST else mc.get_response_elems()
+           
         rootnode=ET.Element("root")
         # add a root node to hang the output xml off 
         ETF.add_text_node_path(rootnode, self.messageIDpath,messagetype)
@@ -54,7 +47,6 @@ class SSVToXML:
                 self.addto_xml(rootnode, elem, lssv )
         
         rv=ETF.pretty(rootnode[0])                            
-
         return rv
     
     #-----------------------------------------------------------------------------------------------        
@@ -62,7 +54,6 @@ class SSVToXML:
         
         config_elem.addto_xml(rootnode,lssv,offset)
               
- 
     #-----------------------------------------------------------------------------------------------        
  
                             
