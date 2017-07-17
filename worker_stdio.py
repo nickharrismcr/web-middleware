@@ -5,7 +5,7 @@ Created on 13 Jul 2017
 '''
 
 import subprocess,logging
-from trace_decorator import trace  
+ 
 
 class WorkerStdio(object):
     
@@ -33,12 +33,12 @@ class WorkerStdio(object):
     def listen(self):
         
         while True:
+            # worker request handler 
             translated_req=self.read(self.app.request_converter) 
             self.app.sink.send(translated_req+"\n")
             translated_resp=self.app.sink.read(translator=self.app.response_converter) 
             self.send(translated_resp+"\n")    
-    
-    @trace("debug")   
+     
     def read(self,translator=None):
         
         if translator:

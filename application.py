@@ -9,20 +9,16 @@ import logging
 from worker_socket import WorkerSocket
 from worker_stdio import WorkerStdio
 from socket_tcp import TCPSocket
-from socket_http import HTTPSocket
+#from socket_http import HTTPSocket
 from converters import ConverterFactory 
        
 
 class Application(object):
     '''
     start the worker. set up a processing chain :
-        worker = source :
-            poll worker for requests :
-                translate request, send to remote host, translate response, send to worker
-        worker = sink :
-            set up TCPServer to handle requests from remote host:
-                translate request, send to worker, translate response, send response to remote host 
-            
+        create appropriate connector objects for the source and sink 
+        instruct the source connector to poll the source, the connectors request handler will perform the translations 
+         and comms to/from the sink and return the response to the source 
     '''
     def __init__(self, config):
         
@@ -33,7 +29,7 @@ class Application(object):
         
         remote_connectors = {
                      "raw"  : TCPSocket, 
-                     "http" : TCPSocket 
+                     "http" : TCPSocket       # TODO : implement http socket connector class 
                             }
  
         
@@ -44,14 +40,16 @@ class Application(object):
         self.datalog=logging.getLogger("datalog")
         self.config=config 
         
-        self.request_converter=ConverterFactory.create(config,config.conn_dir,config.REQUEST)
+        # get converter objects, used by the source request handler 
+        self.request_converter =ConverterFactory.create(config,config.conn_dir,config.REQUEST)
         self.response_converter=ConverterFactory.create(config,config.conn_dir,config.RESPONSE)
         
         if self.config.get("encapsulation","type",None)=="http":
             transport="http"
         else:
             transport=self.config.get("transport","type",None)
-            
+        
+        # get connector objects 
         self.worker_connector = worker_connectors[self.worker_config.conn_type](self.worker_config,self) 
         self.remote_connector = remote_connectors[transport](config,self)
         
@@ -64,6 +62,7 @@ class Application(object):
          
     def poll(self):
         
+        # start the worker. poll the source using the source connectors handler func 
         if self.worker_connector.start_worker(self.command):
             self.running=True 
         else:

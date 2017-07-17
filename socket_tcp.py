@@ -6,13 +6,11 @@ Created on 13 Jul 2017
 
 import   socket, SocketServer , logging
 
-import config 
-
-
 DIR_REQ=0
 DIR_RESP=1
 
-            
+
+#-------------------------------------------------------------------------------------------------------------------------
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
@@ -25,11 +23,10 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         self.request.sendall(translated_resp) 
         self.request.shutdown(socket.SHUT_RDWR)
  
-
-        
+#-------------------------------------------------------------------------------------------------------------------------
 class MyTCPServer(SocketServer.TCPServer):
     
-    '''tcpserver class with some extra references to  application, converters and log objects  '''
+    '''TCPServer class with some extra references to application and log objects  '''
     
     def __init__(self, server_address, RequestHandlerClass, app ):
         
@@ -41,7 +38,7 @@ class MyTCPServer(SocketServer.TCPServer):
     def readmsg(self,conn,converter):
         
         ''' read and translate a message from the remote server
-           called in handler handle method 
+           called in MyTCPHandler handle method 
         ''' 
          
         resp=""
@@ -62,6 +59,8 @@ class MyTCPServer(SocketServer.TCPServer):
     
         return translated_resp
         
+
+#-------------------------------------------------------------------------------------------------------------------------
 class TCPSocket(object):
     '''
     manage tcp remote host connections

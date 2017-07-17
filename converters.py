@@ -47,6 +47,7 @@ class XMLToSSV:
         
         lssv={}
         
+        # read the incoming xml into a node tree 
         try:
             rootnode=ET.fromstring(xml)
         except:
