@@ -9,14 +9,15 @@ transports/encapsulations
 
 '''
 
-import signal,multiprocessing,logging 
+import signal,logging 
 from multiprocessing import freeze_support
 
 import log
 import config 
-import remote_dummy
 from application import Application  
+import remote_test 
 
+TEST=True
 
 def handler(signum, frame):
     
@@ -27,22 +28,21 @@ def handler(signum, frame):
    
 def main():
     
-    
     signal.signal(signal.SIGTERM, handler)
        
     myconfig=config.Config("test.cfg")
     log.init(myconfig)
- 
-    if myconfig.conn_dir=="source":
-        th=multiprocessing.Process(target=remote_dummy.run_dummy_server)
-    else:
-        th=multiprocessing.Process(target=remote_dummy.run_dummy_client)
-    th.start()
     
+    if TEST:
+        remote_test.start(myconfig)
+        
     app=Application(myconfig)
     app.poll()
     app.stop()
-    th.terminate() 
+    
+    if TEST:
+        remote_test.stop()
+
 
 if __name__=="__main__":
     freeze_support()

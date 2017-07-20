@@ -87,7 +87,7 @@ class TCPSocket(object):
 
         # start TCPServer for remote connections. application is a reference to the calling Manager object
         
-        self.log.info("Starting server on %s : %s " % ("localhost", self.port))
+        self.log.info("Starting TCP server on %s : %s " % ("localhost", self.port))
  
         self.server = MyTCPServer(("localhost", self.port), MyTCPHandler , self.app    )
         self.server.allow_reuse_address=True

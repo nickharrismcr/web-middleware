@@ -9,6 +9,7 @@ import logging
 from worker_socket import WorkerSocket
 from worker_stdio import WorkerStdio
 from socket_tcp import TCPSocket
+from socket_http import HTTPSocket 
 #from socket_http import HTTPSocket
 from converters import ConverterFactory 
        
@@ -29,7 +30,7 @@ class Application(object):
         
         remote_connectors = {
                      "raw"  : TCPSocket, 
-                     "http" : TCPSocket       # TODO : implement http socket connector class 
+                     "http" : HTTPSocket       # TODO : implement http socket connector class 
                             }
  
         

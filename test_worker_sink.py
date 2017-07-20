@@ -9,6 +9,7 @@ import sys,time
  
 time.sleep(1)
 log=open("test_worker_sink.log","a")
+#log=sys.stderr
 print >> log, "worker started"
 
 while [ 1 == 1 ]:
@@ -16,6 +17,7 @@ while [ 1 == 1 ]:
     inp=sys.stdin.readline()
     #print >>log, "stdio sink worker : read request" , inp
     sys.stdout.write( "TST|resp|resp2|resp3\n" )
+    sys.stdout.flush()
     #print >>log, "stdio sink worker : sent response TST|resp|resp2|resp3" 
 
     

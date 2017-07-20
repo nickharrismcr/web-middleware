@@ -89,19 +89,19 @@ def run_dummy_client():
     </repeats2>
     <footer>FTR</footer>
 </body>'''
-        time.sleep(1.5)
+        
         HOST, PORT = "localhost", 2468 
-        #print >> log, "Remote client connecting to remote host %s : %s " % ((HOST,PORT))
+        #print >> log, "Remote tcp client connecting to remote host %s : %s " % ((HOST,PORT))
         try:
             sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.connect((HOST,PORT))
         
         except Exception,e : 
-            print >> log, "Remote client : "+str(e)
+            print >> log, "Remote tcp client : "+str(e)
             return 
         
-        #print >> log, "Remote client sending msg "
+        #print >> log, "Remote tcp client sending msg "
         sock.sendall(msg)
         sock.shutdown(socket.SHUT_WR)
         
@@ -112,18 +112,18 @@ def run_dummy_client():
                 break
             resp+=data 
  
-        #print >>log,"remote client read response : "+resp
+        #print >>log,"remote tcp client read response : "+resp
         sock.shutdown(socket.SHUT_RD)
         sock.close()
        
 
             
-    time.sleep(2)
+    time.sleep(1)
     log=sys.stderr  #open("remote_client.log","a")
-    print >>log, "Started dummy remote client "
+    print >>log, "Started dummy remote tcp client "
     for _ in range(1,4):
         doit(log)
-    print >>log, "Ended dummy remote client "
+    print >>log, "Ended dummy remote tcp client "
         
 
 if __name__== "__main__":

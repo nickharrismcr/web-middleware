@@ -11,11 +11,10 @@ DEBUGMODE=False
 
 def init(config):
     
-    global logger_config, DEBUGMODE 
+    global DEBUGMODE 
     
     logging.getLogger().setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    
     
     log=logging.getLogger("log")
     log.setLevel(level=logging.INFO)
@@ -26,7 +25,6 @@ def init(config):
     log.addHandler(console)
     log.addHandler(lfile)
     
-    
     datalog=logging.getLogger("datalog")
     datalog.setLevel(level=logging.INFO)
     dconsole=logging.StreamHandler(stream=sys.stdout)
@@ -35,7 +33,6 @@ def init(config):
     dfile.setFormatter(formatter)
     datalog.addHandler(dconsole)
     datalog.addHandler(dfile)
-    
     
     if DEBUGMODE:
         

@@ -43,11 +43,11 @@ class WorkerStdio(object):
         
         if translator:
             msg=self.pipe.stdout.readline().strip()
-            self.app.log.info("Request from worker " )
             self.datalog.info("Received from worker : \n%s \n" % msg)
             translated_msg=translator.convert(msg)
             self.datalog.info("Sent translated data :\n%s \n" % translated_msg)
             return translated_msg 
+        
         raise StandardError("No translator provided")
           
     def send(self, resp):
