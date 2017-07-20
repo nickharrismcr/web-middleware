@@ -134,6 +134,7 @@ class SSVToXML:
         return rv
     
     #-----------------------------------------------------------------------------------------------        
+    @trace("debug")
     def addto_xml(self, rootnode, config_elem, lssv , offset=0 ): 
         
         config_elem.addto_xml(rootnode,lssv,offset)

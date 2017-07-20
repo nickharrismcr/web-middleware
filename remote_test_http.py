@@ -18,21 +18,43 @@ class MyHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
  
     def do_PUT(self):
 
-        smallmsg='''<body>
-    <header>
-        <message_id>TST</message_id>
-        <response>resp</response>
-        <item>resp2</item>
-        <item2>resp3</item2>
+        respmsg='''<rbody>
+    <header header_attrib="headat">
+      <message_id>TST</message_id>
+      <header_item>HDR</header_item>
+      <header_static_item>This is static content</header_static_item>
     </header>
-</body>'''
+    <repeats>
+      <repeat>
+         <repeat_item rep_attr="rattr1">Ra1</repeat_item>
+      </repeat>
+      <repeat>
+         <repeat_item rep_attr="rattr2">Ra2</repeat_item>
+      </repeat>
+      <repeat>
+         <repeat_item rep_attr="rattr3">Ra3</repeat_item>
+      </repeat>
+    </repeats>
+    <mid>MID</mid>
+    <repeats2>
+      <repeat2>
+         <repeat2_item1>Rb1a</repeat2_item1>
+         <repeat2_item2>Rb1b</repeat2_item2>
+      </repeat2>
+      <repeat2>
+         <repeat2_item1>Rb2a</repeat2_item1>
+         <repeat2_item2>Rb2b</repeat2_item2>
+      </repeat2>
+    </repeats2>
+    <footer>FTR</footer>
+</rbody>'''
  
         content_length = int(self.headers['Content-Length']) 
         post_data = self.rfile.read(content_length) 
         self.send_response(200)
         self.send_header("Content-type", "text/xml")
         self.end_headers()
-        self.wfile.write(smallmsg)       
+        self.wfile.write(respmsg)       
     
     def log_message(self, a,b,c,d):
         pass  
@@ -129,7 +151,7 @@ def run_dummy_client():
     log( str(datetime.datetime.now()) + " Remote http client connecting to remote host %s : %s " % ((HOST,PORT)))
     conn=connect(HOST,PORT)
 
-    for _ in range(1,4):
+    for _ in range(1,10):
         doit(conn)
 
     conn.close()  

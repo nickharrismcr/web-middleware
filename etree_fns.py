@@ -10,6 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 
 re_split=re.compile("><")
+from trace_decorator import trace
 
 def get_path_list(path):
     
@@ -18,36 +19,40 @@ def get_path_list(path):
     """
     
     return re_split.split(path[1:-1])
- 
+
+@trace("debug") 
 def add_text_node_path(node, path,val):
 
     pathlist=get_path_list(path)
     return add_text_node_list(node, pathlist,val)
     
-
+@trace("debug")
 def add_text_node_list(node, pathlist, val ):
     
     new=add_node_list(node,pathlist)
     new.text=val 
     return new 
 
+@trace("debug")
 def add_attribute_path(node, path, attrib, val):
 
     pathlist=get_path_list(path)
     return add_attribute_list(node, pathlist,attrib, val)
-    
+
+@trace("debug")   
 def add_attribute_list(node, pathlist, attrib, val ):
     
     new=add_node_list(node,pathlist) 
     new.set(attrib,val)
     return new 
-        
+
+@trace("debug")        
 def add_node_path(node, path):
 
     pathlist=get_path_list(path)
     return add_node_list(node, pathlist)
     
-
+@trace("debug")
 def add_node_list(node, pathlist ):
     
     if len(pathlist)==1:
@@ -62,7 +67,8 @@ def add_node_list(node, pathlist ):
         return add_node_list(new,pathlist[1:])
     else:
         return add_node_list(ch,pathlist[1:])
- 
+
+@trace("debug")
 def get_node_at_path(node,path):
 
     pathlist=get_path_list(path)

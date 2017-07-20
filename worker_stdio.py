@@ -44,12 +44,14 @@ class WorkerStdio(object):
     def read(self,translator=None):
         
         if translator:
-            msg=self.pipe.stdout.readline().strip()
-            self.datalog.info("Received from worker : \n%s\n%s \n" % ("-"*80,msg))
-            translated_msg=translator.convert(msg)
-            self.datalog.info("Sent translated data :\n%s \n" % translated_msg)
-            return translated_msg 
-        
+            try:
+                msg=self.pipe.stdout.readline().strip()
+                self.datalog.info("Received from worker : \n%s\n%s \n" % ("-"*80,msg))
+                translated_msg=translator.convert(msg)
+                self.datalog.info("Sent translated data :\n%s \n" % translated_msg)
+                return translated_msg 
+            except:
+                raise StandardError("Error converting SSV to XML")
         raise StandardError("No translator provided")
           
     def send(self, resp):
