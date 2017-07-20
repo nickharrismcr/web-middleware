@@ -43,6 +43,7 @@ class HTTPSocket(object):
 
     def __init__(self, config, app):
     
+        self.running=False 
         self.app=app
         self.items=config.worker
         self.socket=None
@@ -60,7 +61,7 @@ class HTTPSocket(object):
     def listen(self):
 
         # start HTTPServer for remote connections. application is a reference to the calling Manager object
-        
+         
         self.log.info("Starting HTTP server on %s : %s " % ("localhost", self.port))
         self.server = BaseHTTPServer.HTTPServer(("127.0.0.1", self.port), MyHTTPHandler , bind_and_activate=False    )
         self.server.allow_reuse_address=True
@@ -69,7 +70,11 @@ class HTTPSocket(object):
         self.server.app=self.app
         self.server.log=logging.getLogger("log")
         self.server.datalog=logging.getLogger("datalog")
-        self.server.serve_forever()
+        try:
+            self.running=True
+            self.server.serve_forever()
+        except:
+            self.running=False 
         
     def connect(self):
         
@@ -103,13 +108,16 @@ class HTTPSocket(object):
  
         self.disconnect()
         body=resp.read()
-        self.datalog.info("Received response : \n%s \n" % body) 
+        self.datalog.info("Received response : \n%s\n%s \n" % ("-"*80, body))
         translated_resp=translator.convert(body)
         self.datalog.info("Translated response : \n%s \n" % translated_resp)    
 
         return translated_resp
     
- 
+    def stop(self):
+        # can only be called by signal handler in main.py 
+        if self.running:
+            self.server.shutdown()
  
     
     

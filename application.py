@@ -30,7 +30,7 @@ class Application(object):
         
         remote_connectors = {
                      "raw"  : TCPSocket, 
-                     "http" : HTTPSocket       # TODO : implement http socket connector class 
+                     "http" : HTTPSocket        
                             }
  
         
@@ -54,6 +54,7 @@ class Application(object):
         self.worker_connector = worker_connectors[self.worker_config.conn_type](self.worker_config,self) 
         self.remote_connector = remote_connectors[transport](config,self)
         
+        # wire them up 
         if config.conn_dir=="source":
             self.source=self.worker_connector
             self.sink=self.remote_connector
@@ -63,7 +64,7 @@ class Application(object):
          
     def poll(self):
         
-        # start the worker. poll the source using the source connectors handler func 
+        # start the worker. poll the source using the source connectors handler method  
         if self.worker_connector.start_worker(self.command):
             self.running=True 
         else:
@@ -76,7 +77,8 @@ class Application(object):
         
         if self.running:
             self.running=False
-            self.worker_connector.stop()
+            self.source.stop()
+            self.sink.stop() 
  
             
         

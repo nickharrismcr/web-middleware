@@ -9,7 +9,7 @@ transports/encapsulations
 
 '''
 
-import signal,logging 
+import sys,signal,logging 
 from multiprocessing import freeze_support
 
 import log
@@ -22,7 +22,7 @@ TEST=True
 def handler(signum, frame):
     
     global app
-    logging.getLogger("log").critical("SIGTERM signal reoeived. stopping worker")
+    logging.getLogger("log").critical("SIGTERM signal reoeived. Shutting down.")
     app.stop()
     exit()
    
@@ -35,11 +35,17 @@ def main():
     
     if TEST:
         remote_test.start(myconfig)
-        
-    app=Application(myconfig)
-    app.poll()
-    app.stop()
     
+    try:       
+        app=Application(myconfig)
+        app.poll()
+        app.stop()
+        
+    except Exception,e:
+        print >>sys.stderr, str(e)
+        if TEST:
+            raise 
+         
     if TEST:
         remote_test.stop()
 
