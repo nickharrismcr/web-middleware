@@ -12,9 +12,7 @@ class WorkerStdio(object):
     ''' communicate with a stdio worker process '''
 
     def __init__(self, config, app):
-        '''
-        Constructor
-        '''
+      
         self.app=app
         self.config=config 
         self.log=logging.getLogger("log")

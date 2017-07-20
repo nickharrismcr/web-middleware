@@ -11,7 +11,5 @@ class WorkerSocket(object):
 
 
     def __init__(self, config):
-        '''
-        Constructor
-        '''
+    
         pass
