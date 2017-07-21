@@ -5,13 +5,11 @@ Created on 7 Jul 2017
 
 TODO : 
 
-parser error reporting
 use xmlmessage messageType/workermessageType 
-http encapsulation use configured values for method/url 
 
 '''
 
-import sys,signal,logging 
+import signal,logging, sys
 from multiprocessing import freeze_support
 
 import log
@@ -30,10 +28,12 @@ def handler(signum, frame):
    
 def main():
     
-    signal.signal(signal.SIGTERM, handler)
+    signal.signal(signal.SIGTERM, handler)   
     
-    log.initdebug()
-    myconfig=config.Config("test.cfg")
+    if TEST:
+        log.initdebug()
+    
+    myconfig=config.Config(sys.argv)
     log.init(myconfig)
     
     if TEST:
@@ -45,7 +45,9 @@ def main():
         app.stop()
         
     except Exception,e:
-        print >>sys.stderr, str(e)
+        
+        logging.getLogger("log").critical(str(e))
+        
         if TEST:
             raise 
          

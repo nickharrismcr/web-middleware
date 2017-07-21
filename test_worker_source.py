@@ -14,7 +14,7 @@ time.sleep(1)
 log=sys.stderr
 #print >> log, "worker started"
 for i in range(1,4):
-    req="TST|HDR|headat|3|MID|2|FTR|Ra1|rattr1|Ra2|rattr2|Ra3|rattr3|Rb1a|Rb1b|Rb2a|Rb2b\n"
+    req="[TST]|HDR|headat|3|MID|2|FTR|Ra1|rattr1|Ra2|rattr2|Ra3|rattr3|Rb1a|Rb1b|Rb2a|Rb2b\n"
     #print >>log, "writing request "+req 
     sys.stdout.write(req)
     sys.stdout.flush()

@@ -11,7 +11,6 @@ from collections import OrderedDict
 import config_base
 import etree_fns
 from config_base import ParsingError
-import logging
  
 
 
@@ -30,19 +29,37 @@ class XMLMessageConfig():
     
     # class level dict of message types 
     xml_messages = OrderedDict()
+    xml_workermessages = OrderedDict()
  
     def __init__(self, config, name,  params, configdata):
         
         config_sections=config_base.get_sections(configdata)
         
+        self.items=OrderedDict()
         self.request_elems=[]
         self.response_elems=[]
-        self.xml_messages[params[0]]=self
         self.messagetype=params[0]
         self.request_value_count=0
         self.reply_value_count=0
         
         # populate request and reply data 
+        
+        fields={ "messageType"       : (config_base.read_string, True ),
+                 "workerMessageType" : (config_base.read_string, True)
+               }
+
+        for n,l in config_sections["main"][1]:
+            try:
+                what=l.split("=")[0]
+                which=l.split("=")[1]
+                self.items[what]=config_base.read_config(fields,what,which) 
+            except Exception,e:
+                raise ParsingError("Config line %s : invalid item : %s " % (n,str(e) ))
+        
+        config_base.check_config("Message %s" % self.messagetype , fields, self.items)
+        print self.items
+        self.xml_messages[self.items["messageType"]]=self
+        self.xml_workermessages[self.items["workerMessageType"]]=self
         
         if "request" in config_sections:
             for n,l in  config_sections["request"][1]:
@@ -83,6 +100,9 @@ class XMLMessageConfig():
         if self.reply_value_count-1 != self.response_elems[-1].ssv_col:
             raise ParsingError("xmlmessage %s invalid reply value count %s " % (self.messagetype, self.reply_value_count))
 
+    def get(self,itemkey):
+        return self.items[itemkey]
+    
     @classmethod
     def iterate_message_list(cls):
         return cls.xml_messages.iteritems()
@@ -100,8 +120,14 @@ class XMLMessageConfig():
         
     @classmethod
     def get_config(cls,messagetype):
-        # get the XMLMessageConfig object for the given message type 
+        # get the XMLMessageConfig object for the given xml message type 
         return cls.xml_messages[messagetype]
+    
+    @classmethod
+    def get_config_worker(cls,messagetype):
+        # get the XMLMessageConfig object for the given worker message type 
+        return cls.xml_workermessages[messagetype]
+    
     
     def get_request_elems(self):
         return self.request_elems

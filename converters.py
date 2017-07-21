@@ -35,7 +35,7 @@ class XMLToSSV:
     def __init__(self,config,req_or_resp):
         
         self.req_or_resp=req_or_resp
-        self.items=config
+        self.config=config
         self.messagetypes={}
         delim_elem="todelimiter" if req_or_resp == config.REQUEST else "fromdelimiter"
         self.delim=config.get("main",delim_elem,",")
@@ -59,16 +59,17 @@ class XMLToSSV:
         else:
             raise StandardError("No message type element in XML") 
         
-        mc=config_xml.XMLMessageConfig.get_config(messagetype)    
-        msg_elements = mc.get_request_elems() if self.req_or_resp==self.items.REQUEST else mc.get_response_elems()
+        mc=self.config.get_xmlconfig(messagetype)    
+        msg_elements = mc.get_request_elems() if self.req_or_resp==self.config.REQUEST else mc.get_response_elems()
  
-        # for each xml element defined in the items, search the input xml tree for a matching path and get the value there
+        # for each xml element defined in the config, search the input xml tree for a matching path and get the value there
         if msg_elements != []:
             for elem in msg_elements:      
                 self.addto_ssv(rootnode, elem, lssv )
         
+        out=[mc.get("workerMessageType")]
+                 
         # expand any placeholder repeat groups in the ssv with their values 
-        out=[messagetype]         
         for k in sorted(lssv.keys()):
             i=lssv[k]
             if isinstance(i,dict):
@@ -83,7 +84,7 @@ class XMLToSSV:
     #-----------------------------------------------------------------------------------------------                  
     def addto_ssv(self,rootnode, elem, lssv, offset=0 ): 
             
-        # each items element type queries the input xml tree in its own way 
+        # each config element type queries the input xml tree in its own way 
         elem.addto_ssv(rootnode,lssv,offset)
 
     #-----------------------------------------------------------------------------------------------        
@@ -101,7 +102,7 @@ class SSVToXML:
     
     def __init__(self,config,req_or_resp):
  
-        self.items=config 
+        self.config=config 
         self.req_or_resp=req_or_resp
         self.messagetypes={}
         delim_elem="todelimiter" if req_or_resp == config.REQUEST else "fromdelimiter"
@@ -119,13 +120,13 @@ class SSVToXML:
         lssv=ssv.split(self.delim)
         messagetype=lssv[0]
         
-        mc=self.items.get_xmlconfig(messagetype)    
-        msg_elements = mc.get_request_elems() if self.req_or_resp==self.items.REQUEST else mc.get_response_elems()
+        mc=self.config.get_xml_config_by_worker_type(messagetype)    
+        msg_elements = mc.get_request_elems() if self.req_or_resp==self.config.REQUEST else mc.get_response_elems()
            
         rootnode=ET.Element("root")
         # add a root node to hang the output xml off 
-        ETF.add_text_node_path(rootnode, self.messageIDpath,messagetype)
-        # for each element in the request items, create an output xml node containing the corresponding ssv value 
+        ETF.add_text_node_path(rootnode, self.messageIDpath,mc.get("messageType"))
+        # for each element in the request config, create an output xml node containing the corresponding ssv value 
         if msg_elements != []:
             for elem in msg_elements:     
                 self.addto_xml(rootnode, elem, lssv )

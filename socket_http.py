@@ -45,18 +45,22 @@ class HTTPSocket(object):
     
         self.running=False 
         self.app=app
-        self.items=config.worker
+        self.config=config.worker
         self.socket=None
-        self.type=self.items.conn_dir    #source|sink 
+        self.type=self.config.conn_dir    #source|sink 
         if self.type=="source":
-            self.ipaddr=(self.items.get("main","remoteserver",None))
-            self.port=int(self.items.get("main","remoteport",None))
+            self.ipaddr=(self.config.get("main","remoteserver",None))
+            self.port=int(self.config.get("main","remoteport",None))
         elif self.type=="sink":
-            self.port=int(self.items.get("transport","port",None))
+            self.port=int(self.config.get("transport","port",None))
         self.log=logging.getLogger("log")
         self.datalog=logging.getLogger("datalog")
         self.request_converter=app.request_converter
         self.response_converter=app.response_converter 
+        self.content_type=self.config.get("encapsulation","contentType","text/xml")
+        self.request_method=self.config.get("encapsulation","requestMethod","PUT")
+        self.request_URI=self.config.get("encapsulation","requestURI","/")
+        
                  
     def listen(self):
 
@@ -91,7 +95,8 @@ class HTTPSocket(object):
     def send(self, request):
         
         self.connect()
-        self.conn.request("PUT", "/", request )
+        headers={ "Content-type" : self.content_type }
+        self.conn.request(self.request_method, self.request_URI, request, headers) 
 
     def read(self, translator=None):       
            

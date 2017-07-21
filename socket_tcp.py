@@ -70,14 +70,14 @@ class TCPSocket(object):
     def __init__(self, config, app):
     
         self.app=app
-        self.items=config.worker
+        self.config=config.worker
         self.socket=None
-        self.type=self.items.conn_dir    #source|sink 
+        self.type=self.config.conn_dir    #source|sink 
         if self.type=="source":
-            self.ipaddr=(self.items.get("main","remoteserver",None))
-            self.port=int(self.items.get("main","remoteport",None))
+            self.ipaddr=(self.config.get("main","remoteserver",None))
+            self.port=int(self.config.get("main","remoteport",None))
         elif self.type=="sink":
-            self.port=int(self.items.get("transport","port",None))
+            self.port=int(self.config.get("transport","port",None))
         self.log=logging.getLogger("log")
         self.datalog=logging.getLogger("datalog")
         self.request_converter=app.request_converter

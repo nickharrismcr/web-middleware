@@ -24,7 +24,7 @@ def get_subsection(line):
 def get_sections(indata):
         
     """
-    takes a items section and returns a dictionary of subsections : (params,block)
+    takes a config section and returns a dictionary of subsections : (params,block)
     """ 
     
     indict=OrderedDict()
@@ -56,6 +56,10 @@ def get_section(line):
     return line.split("[")[1].split("]")[0].split()
      
 #--------------------------------------------------------------------------------------------------------------------- 
+def read_string(data):
+    return data 
+
+#--------------------------------------------------------------------------------------------------------------------- 
 def read_delimiter(data):
      
     if data[0] in ('"',"'"):
@@ -69,25 +73,35 @@ def read_message_id(data):
     return data.split(",")[1] 
  
 #---------------------------------------------------------------------------------------------------------------------                    
-def read_config(readers, what, data):
+def read_config(fields, what, data):
      
     """ 
-    read a items line value using a reader func if defined in readers[] else return the item raw 
+    read a config line value using a reader func if defined in readers[] else return the item raw 
     """ 
     
-    if what in readers:
+    if what in fields:
         try:
-            return readers[what](data)
+            return fields[what][0](data)
         except Exception,e:
-            raise StandardError("Invalid configuration %s=%s : %s " % (what,data,str(e)))
+            raise ParsingError("Invalid configuration %s=%s : %s " % (what,data,str(e)))
     else:
         return data
-
-
+#---------------------------------------------------------------------------------------------------------------------      
+def check_config(name, fields,items):
+    
+    for field,t in fields.iteritems():
+        _,mandatory=t 
+        myassert ( not mandatory or field in items , "%s %s not defined " % (name, field))
+            
 #---------------------------------------------------------------------------------------------------------------------      
 class ParsingError(Exception):
     pass 
 #---------------------------------------------------------------------------------------------------------------------       
+def myassert(cond, error):
+    
+    if not cond:
+        raise ParsingError(error)
+    
 #---------------------------------------------------------------------------------------------------------------------       
 # classes for message config elements.  all have methods for 
 # * getting text content of their specified xml node from the passed in tree and adding it to the ssv list, 
@@ -96,7 +110,7 @@ class ParsingError(Exception):
 class ConfigElement(object): 
     
     """ 
-    holds data for an individual element type items line
+    holds data for an individual element type config line
     """
 
     def __init__(self,config, lineno, what):
@@ -105,7 +119,7 @@ class ConfigElement(object):
         self.lineno=lineno
         self.path=path
         self.ssv_col=int(col)-1
-        self.items=config
+        self.config=config
        
     def addto_xml(self, rootnode, lssv , offset=0 ): 
     
@@ -119,10 +133,10 @@ class ConfigElement(object):
  
            
     def __str__(self):
-        return "items element %s|%s" %( self.path,self.ssv_col)
+        return "config element %s|%s" %( self.path,self.ssv_col)
     
     def __repr__(self):
-        return "items element %s|%s" %( self.path,self.ssv_col)
+        return "config element %s|%s" %( self.path,self.ssv_col)
  
     
     
@@ -130,7 +144,7 @@ class ConfigElement(object):
 class ConfigAttribute(object):
     
     """
-    holds data for an individual attribute type items line
+    holds data for an individual attribute type config line
     """ 
     
     def __init__(self,config, lineno, what):
@@ -140,7 +154,7 @@ class ConfigAttribute(object):
         self.path=path
         self.attribute=attrib 
         self.ssv_col=int(col)-1
-        self.items=config
+        self.config=config
 
     def addto_xml(self, rootnode, lssv , offset=0 ): 
         
@@ -155,10 +169,10 @@ class ConfigAttribute(object):
                 lssv[self.ssv_col+offset]=node.attrib[self.attribute]          
     
     def __str__(self):
-        return "items attribute %s|%s|%s" %( self.path,self.attribute,self.ssv_col)
+        return "config attribute %s|%s|%s" %( self.path,self.attribute,self.ssv_col)
     
     def __repr__(self):
-        return "items attribute %s|%s|%s" %( self.path,self.attribute,self.ssv_col)
+        return "config attribute %s|%s|%s" %( self.path,self.attribute,self.ssv_col)
  
    
     
@@ -167,7 +181,7 @@ class ConfigAttribute(object):
 class ConfigRepeat(object):
     
     """ 
-    holds data for an individual repeat type items line
+    holds data for an individual repeat type config line
     """
     
     def __init__(self,config, lineno, what):
@@ -177,16 +191,16 @@ class ConfigRepeat(object):
         self.path=path
         self.startcol=int(startcol)-1
         self.ssv_col=int(col)-1
-        self.items=config
+        self.config=config
 
     @trace("debug")
     def addto_xml(self, rootnode, lssv , offset=0 ): 
         
-            # repeater element. get the repeat group items and recursively call this routine with the contents 
+            # repeater element. get the repeat group config and recursively call this routine with the contents 
             
             repeats=int(lssv[self.ssv_col+offset])
             nextcol=self.startcol                  
-            rc=self.items.get_xmlrepeatconfig(self.xmlrepeatconfigname)
+            rc=self.config.get_xmlrepeatconfig(self.xmlrepeatconfigname)
             repeatrootnode=ETF.add_node_path(rootnode,self.path)
             cols_required=repeats*rc.value_count
             
@@ -213,7 +227,7 @@ class ConfigRepeat(object):
         tempssv=OrderedDict()
         
         repeatroot=ETF.get_node_at_path(rootnode, self.path)                  
-        rc=self.items.get_xmlrepeatconfig(self.xmlrepeatconfigname)
+        rc=self.config.get_xmlrepeatconfig(self.xmlrepeatconfigname)
         vals=rc.value_count
         repeatcount=0
         for child in repeatroot:
@@ -231,16 +245,16 @@ class ConfigRepeat(object):
     
                 
     def __str__(self):
-        return "items repeat %s|%s|%s " % ( self.path , self.startcol, self.ssv_col)
+        return "config repeat %s|%s|%s " % ( self.path , self.startcol, self.ssv_col)
     
     def __repr__(self):
-        return "items repeat %s|%s|%s " % ( self.path , self.startcol, self.ssv_col)
+        return "config repeat %s|%s|%s " % ( self.path , self.startcol, self.ssv_col)
  
 #---------------------------------------------------------------------------------------------------------------------                    
 class ConfigStaticElement(object):
     
     """ 
-    holds data for an individual static element type items line
+    holds data for an individual static element type config line
     """
 
     def __init__(self,config, lineno, what):
@@ -249,7 +263,7 @@ class ConfigStaticElement(object):
         self.lineno=lineno
         self.path=path
         self.value=value
-        self.items=config
+        self.config=config
          
     def addto_xml(self, rootnode, lssv , offset=0 ): 
         
@@ -260,17 +274,17 @@ class ConfigStaticElement(object):
         pass   
     
     def __str__(self):
-        return "static items element : "+self.path   +"|"+self.value  
+        return "static config element : "+self.path   +"|"+self.value  
     
     def __repr__(self):
-        return "static items element : "+self.path   +"|"+self.value  
+        return "static config element : "+self.path   +"|"+self.value  
  
     
 #---------------------------------------------------------------------------------------------------------------------                    
 class ConfigStaticAttribute(object):
     
     """
-    holds data for an individual static attribute type items line
+    holds data for an individual static attribute type config line
     """ 
     
     def __init__(self,config, lineno, what):
@@ -280,7 +294,7 @@ class ConfigStaticAttribute(object):
         self.path=path
         self.attribute=attrib 
         self.value=value
-        self.items=config 
+        self.config=config 
 
     def addto_xml(self, rootnode, lssv , offset=0 ): 
         
@@ -291,10 +305,10 @@ class ConfigStaticAttribute(object):
         pass   
           
     def __str__(self):
-        return "static items attribute "+self.path+"|"+self.attribute+"|"+self.value
+        return "static config attribute "+self.path+"|"+self.attribute+"|"+self.value
     
     def __repr__(self):
-        return "static items attribute "+self.path+"|"+self.attribute+"|"+self.value
+        return "static config attribute "+self.path+"|"+self.attribute+"|"+self.value
         
 #---------------------------------------------------------------------------------------------------------------------                    
 

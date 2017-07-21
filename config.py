@@ -8,7 +8,7 @@ from collections import OrderedDict
 from config_worker import WorkerConfig
 import config_base
 import config_xml
-import re,logging,sys
+import re,sys
 from config_base import ParsingError
 
 re_section = re.compile("^\[.*\]")
@@ -23,9 +23,14 @@ class Config:
     REQUEST=1
     RESPONSE=2 
     
-    def __init__(self, p_file):
+    def __init__(self, argv):
+ 
+        # config file is in argv 
+        
+        self.file=argv[1] 
  
         # for each config section, instantiate and populate a relevant config object 
+        # worker section is mandatory
         
         self.config_classes={ 
                         "worker"     : WorkerConfig ,
@@ -33,7 +38,7 @@ class Config:
                         "xmlrepeat"  : config_xml.XMLRepeatConfig
                       } 
         try:
-            self.data=[ i for i in open(p_file,"r")]
+            self.data=[ i for i in open(self.file,"r")]
             self.configs=OrderedDict()
             self.block=[]
             self.curr_section=""
@@ -61,6 +66,9 @@ class Config:
             config_obj=self.config_classes[self.curr_section](self, self.curr_section, self.curr_params, self.block )
             self.configs[self.curr_section]=config_obj
             
+            if not "worker" in self.configs:
+                raise ParsingError("Worker section not defined in "+p_file)
+            
             # ensure all messages listed in the worker section have definitions in the message items sections 
             self.configs["worker"].check()
             
@@ -73,7 +81,7 @@ class Config:
                 
         except ParsingError,e:
             print >>sys.stderr, "%s : %s " % (type(e).__name__, str(e))
-            exit()
+            raise #exit()
             
     @property
     def worker(self):
@@ -95,9 +103,18 @@ class Config:
     def conn_dir(self):
         return self.configs["worker"].conn_dir 
     
-    def get_xmlconfig(self,message):
-        return self.configs["xmlmessage"].get_config(message)
-    
+    def get_xmlconfig(self,messagetype):
+        try:
+            return self.configs["xmlmessage"].get_config(messagetype)
+        except:
+            raise StandardError("XML message type %s not defined" % messagetype )
+        
+    def get_xml_config_by_worker_type(self,messagetype):
+        try:
+            return self.configs["xmlmessage"].get_config_worker(messagetype)
+        except:
+            raise StandardError("Worker message type %s not defined " % messagetype )
+        
     def get_xmlrepeatconfig(self,message):
         return self.configs["xmlrepeat"].get_config(message)
     

@@ -50,8 +50,9 @@ class WorkerStdio(object):
                 translated_msg=translator.convert(msg)
                 self.datalog.info("Sent translated data :\n%s \n" % translated_msg)
                 return translated_msg 
-            except:
-                raise StandardError("Error converting SSV to XML")
+            except Exception,e:
+                raise StandardError("Error converting SSV to XML : "+str(e))
+            
         raise StandardError("No translator provided")
           
     def send(self, resp):
