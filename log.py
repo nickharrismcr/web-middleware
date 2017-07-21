@@ -34,8 +34,10 @@ def init(config):
     datalog.addHandler(dconsole)
     datalog.addHandler(dfile)
     
+def initdebug():
+    
     if DEBUGMODE:
-        
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         debug=logging.getLogger("debug")
         debug.setLevel(level=logging.DEBUG)
         debconsole=logging.StreamHandler(stream=sys.stdout)

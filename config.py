@@ -8,7 +8,8 @@ from collections import OrderedDict
 from config_worker import WorkerConfig
 import config_base
 import config_xml
-import re
+import re,logging,sys
+from config_base import ParsingError
 
 re_section = re.compile("^\[.*\]")
  
@@ -31,37 +32,49 @@ class Config:
                         "xmlmessage" : config_xml.XMLMessageConfig, 
                         "xmlrepeat"  : config_xml.XMLRepeatConfig
                       } 
-        
-        self.data=[ i for i in open(p_file,"r")]
-        self.configs=OrderedDict()
-        self.block=[]
-        self.curr_section=""
-        self.curr_params=[]
-
-        for number, line in enumerate(self.data):
-             
-            if line[0]=="\n" or line[0]=="#" or line[0]==" ":
-                continue
-            
-            if re_section.search(line)!=None:
-                if self.curr_section != "":
-                    
-                    config_obj=self.config_classes[self.curr_section](self, self.curr_section,self.curr_params, self.block )
-                    self.configs[self.curr_section]=config_obj
- 
-                self.block=[]
-                s=config_base.get_section(line)  
-                self.curr_section=s[0] 
-                self.curr_params=s[1:]
-            
-            else:
-                self.block.append((number+1,line[:-1]))
+        try:
+            self.data=[ i for i in open(p_file,"r")]
+            self.configs=OrderedDict()
+            self.block=[]
+            self.curr_section=""
+            self.curr_params=[]
+    
+            for number, line in enumerate(self.data):
+                 
+                if line[0]=="\n" or line[0]=="#" or line[0]==" ":
+                    continue
                 
-        config_obj=self.config_classes[self.curr_section](self, self.curr_section, self.curr_params, self.block )
-        self.configs[self.curr_section]=config_obj
-        
-        self.configs["worker"].check()
-        
+                if re_section.search(line)!=None:
+                    if self.curr_section != "":
+                        
+                        config_obj=self.config_classes[self.curr_section](self, self.curr_section,self.curr_params, self.block )
+                        self.configs[self.curr_section]=config_obj
+     
+                    self.block=[]
+                    s=config_base.get_section(line)  
+                    self.curr_section=s[0] 
+                    self.curr_params=s[1:]
+                
+                else:
+                    self.block.append((number+1,line[:-1]))
+                    
+            config_obj=self.config_classes[self.curr_section](self, self.curr_section, self.curr_params, self.block )
+            self.configs[self.curr_section]=config_obj
+            
+            # ensure all messages listed in the worker section have definitions in the message items sections 
+            self.configs["worker"].check()
+            
+            # ensure messageID/replymessageID are valid in all the XMLmessage defs 
+            messageIDpath=self.configs["worker"].get("message","messageID",None)
+            replymessageIDpath=self.configs["worker"].get("message","replymessageID",None)
+            for _,message in self.configs["xmlmessage"].iterate_message_list():
+                message.check_messageID_path(messageIDpath)
+                message.check_replymessageID_path(replymessageIDpath)
+                
+        except ParsingError,e:
+            print >>sys.stderr, "%s : %s " % (type(e).__name__, str(e))
+            exit()
+            
     @property
     def worker(self):
         return self.configs["worker"]

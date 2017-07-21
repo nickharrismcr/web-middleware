@@ -9,6 +9,9 @@ each holds a dict of ConfigElement etc. objects,  one per config line
 
 from collections import OrderedDict
 import config_base
+import etree_fns
+from config_base import ParsingError
+import logging
  
 
 
@@ -34,34 +37,55 @@ class XMLMessageConfig():
         
         self.request_elems=[]
         self.response_elems=[]
-       
+        self.xml_messages[params[0]]=self
+        self.messagetype=params[0]
+        self.request_value_count=0
+        self.reply_value_count=0
+        
         # populate request and reply data 
         
         if "request" in config_sections:
             for n,l in  config_sections["request"][1]:
-                which,what=l.split("=") 
-                if which=="valueCount":
-                    self.value_count=what
-                else:
-                    lineclass=classlookup[which]
-                    if lineclass:
-                        self.request_elems.append(lineclass(config, n,what))
-        
-                
+                try:
+                    which,what=l.split("=") 
+                    if which=="valueCount":
+                        self.request_value_count=int(what)
+                    else:
+                        lineclass=classlookup[which]
+                        if lineclass:
+                            self.request_elems.append(lineclass(config, n,what))
+                except:
+                    raise ParsingError("Invalid configuration : %s at line %s " % (l,n))
+        else:
+            raise ParsingError("xmlmessage %s missing request definition" % self.messagetype )
+              
         if "reply" in config_sections:
             for n,l in  config_sections["reply"][1]:
-                which,what=l.split("=") 
-                if which=="valueCount":
-                    self.value_count=what
-                else:
-                    lineclass=classlookup[which]
-                    if lineclass:
-                        self.response_elems.append(lineclass(config, n,what))
-               
-                    
-        self.xml_messages[params[0]]=self
-        self.messagetype=params[0]
+                try:
+                    which,what=l.split("=") 
+                    if which=="valueCount":
+                        self.reply_value_count=int(what)
+                    else:
+                        lineclass=classlookup[which]
+                        if lineclass:
+                            self.response_elems.append(lineclass(config, n,what))
+                except:
+                    raise ParsingError("Invalid configuration : %s at line %s " % (l,n))
+        else:
+            raise ParsingError("xmlmessage %s missing reply definition" % self.messagetype )            
         
+        if self.request_value_count==0:
+            raise ParsingError("xmlmessage %s missing request value count " % self.messagetype )
+        if self.request_value_count-1 != self.request_elems[-1].ssv_col:
+            raise ParsingError("xmlmessage %s invalid request value count %s " % (self.messagetype,self.request_value_count))
+        if self.reply_value_count==0:
+            raise ParsingError("xmlmessage %s missing reply value count " % self.messagetype )
+        if self.reply_value_count-1 != self.response_elems[-1].ssv_col:
+            raise ParsingError("xmlmessage %s invalid reply value count %s " % (self.messagetype, self.reply_value_count))
+
+    @classmethod
+    def iterate_message_list(cls):
+        return cls.xml_messages.iteritems()
         
     @classmethod
     def list_messages(cls):
@@ -84,6 +108,24 @@ class XMLMessageConfig():
     
     def get_response_elems(self):
         return self.response_elems
+    
+    def check_messageID_path(self,path):
+        
+        pathlist=etree_fns.get_path_list(path)
+        for req_elem in self.request_elems:
+            reqpath=etree_fns.get_path_list(req_elem.path)
+            if pathlist[0]!=reqpath[0]:
+                raise ParsingError("messageID path %s does not match request path at config line %s : %s " % 
+                                    (path, req_elem.lineno,req_elem.path))
+    
+    def check_replymessageID_path(self,path):
+        
+        pathlist=etree_fns.get_path_list(path)
+        for resp_elem in self.response_elems:
+            resppath=etree_fns.get_path_list(resp_elem.path)
+            if pathlist[0]!=resppath[0]:
+                raise ParsingError("replymessageID path %s does not match reply path at config line %s : %s " % 
+                                    (path, resp_elem.lineno, resp_elem.path))
     
 #---------------------------------------------------------------------------------------------------------------------                    
     

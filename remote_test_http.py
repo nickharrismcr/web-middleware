@@ -151,7 +151,7 @@ def run_dummy_client():
     log( str(datetime.datetime.now()) + " Remote http client connecting to remote host %s : %s " % ((HOST,PORT)))
     conn=connect(HOST,PORT)
 
-    for _ in range(1,10):
+    for _ in range(1,2):
         doit(conn)
 
     conn.close()  

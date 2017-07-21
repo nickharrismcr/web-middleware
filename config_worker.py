@@ -7,6 +7,7 @@ Created on 14 Jul 2017
 import config_base
 import config_xml
 from collections import OrderedDict
+from config_base import ParsingError
 
 class WorkerConfig(object):
     
@@ -41,9 +42,9 @@ class WorkerConfig(object):
             if item in self.items[section].items:
                 return self.items[section][item]
             elif default==None:
-                raise StandardError("Config worker section : subsection %s : item %s not found " % (section, item))
+                raise ParsingError("Config worker section : subsection %s : item %s not found " % (section, item))
         elif default==None:
-            raise StandardError("Config %s section : subsection %s not found " % section)   
+            raise ParsingError("Config %s section : subsection %s not found " % section)   
    
         return default 
                    
@@ -52,7 +53,7 @@ class WorkerConfig(object):
         # ensure all messages listed in the worker section have definitions in the message items sections 
         for k in self.items["message"].messages:
             if not self.config.check_message_defined(k):
-                raise LookupError("Config line %s : message type %s is not defined " % (self.messages[k],k))
+                raise ParsingError("Config line %s : message type %s is not defined " % (self.messages[k],k))
             
             
 
@@ -76,7 +77,7 @@ class WorkerMainConfig(object):
                 which=l.split("=")[1]
                 self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
-                raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
+                raise ParsingError("Config line %s : invalid item : %s " % (n,str(e) ))
 
     def __getitem__(self,i):
         return self.items[i]
@@ -99,7 +100,7 @@ class WorkerTransportConfig(object):
                 which=l.split("=")[1]
                 self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
-                raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
+                raise ParsingError("Config line %s : invalid item : %s " % (n,str(e) ))
 
     def __getitem__(self,i):
         return self.items[i]
@@ -128,7 +129,7 @@ class WorkerMessageConfig(object):
                 else:
                     self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
-                raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
+                raise ParsingError("Config line %s : invalid item : %s " % (n,str(e) ))
             
     def __getitem__(self,i):
         return self.items[i]
@@ -150,7 +151,7 @@ class WorkerEncapsulationConfig(object):
                 which=l.split("=")[1]
                 self.items[what]=config_base.read_config(readers,what,which) 
             except Exception,e:
-                raise StandardError("Config line %s : parsing error : %s " % (n,str(e) ))
+                raise ParsingError("Config line %s : invalid item : %s " % (n,str(e) ))
             
     def __getitem__(self,i):
         return self.items[i]

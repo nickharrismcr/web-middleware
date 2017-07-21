@@ -5,7 +5,9 @@ Created on 7 Jul 2017
 
 TODO : 
 
-transports/encapsulations 
+parser error reporting
+use xmlmessage messageType/workermessageType 
+http encapsulation use configured values for method/url 
 
 '''
 
@@ -29,7 +31,8 @@ def handler(signum, frame):
 def main():
     
     signal.signal(signal.SIGTERM, handler)
-       
+    
+    log.initdebug()
     myconfig=config.Config("test.cfg")
     log.init(myconfig)
     
