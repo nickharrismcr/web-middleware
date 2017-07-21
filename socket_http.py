@@ -47,12 +47,9 @@ class HTTPSocket(object):
         self.app=app
         self.config=config.worker
         self.socket=None
-        self.type=self.config.conn_dir    #source|sink 
-        if self.type=="source":
-            self.ipaddr=(self.config.get("main","remoteserver",None))
-            self.port=int(self.config.get("main","remoteport",None))
-        elif self.type=="sink":
-            self.port=int(self.config.get("transport","port",None))
+        self.type=self.config.conn_dir    #source|sink  
+        self.ipaddr=(self.config.get("main","remoteserver",None))
+        self.port=int(self.config.get("main","remoteport",None))
         self.log=logging.getLogger("log")
         self.datalog=logging.getLogger("datalog")
         self.request_converter=app.request_converter

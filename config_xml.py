@@ -57,7 +57,6 @@ class XMLMessageConfig():
                 raise ParsingError("Config line %s : invalid item : %s " % (n,str(e) ))
         
         config_base.check_config("Message %s" % self.messagetype , fields, self.items)
-        print self.items
         self.xml_messages[self.items["messageType"]]=self
         self.xml_workermessages[self.items["workerMessageType"]]=self
         

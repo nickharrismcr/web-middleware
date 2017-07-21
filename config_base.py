@@ -24,7 +24,7 @@ def get_subsection(line):
 def get_sections(indata):
         
     """
-    takes a config section and returns a dictionary of subsections : (params,block)
+    takes a config section and returns a dictionary of { subsections : (params,block) } 
     """ 
     
     indict=OrderedDict()
@@ -196,7 +196,7 @@ class ConfigRepeat(object):
     @trace("debug")
     def addto_xml(self, rootnode, lssv , offset=0 ): 
         
-            # repeater element. get the repeat group config and recursively call this routine with the contents 
+            # repeater element. get the repeat group config and process its elements 
             
             repeats=int(lssv[self.ssv_col+offset])
             nextcol=self.startcol                  

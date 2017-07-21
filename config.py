@@ -67,7 +67,7 @@ class Config:
             self.configs[self.curr_section]=config_obj
             
             if not "worker" in self.configs:
-                raise ParsingError("Worker section not defined in "+p_file)
+                raise ParsingError("Worker section not defined in config file")
             
             # ensure all messages listed in the worker section have definitions in the message items sections 
             self.configs["worker"].check()
