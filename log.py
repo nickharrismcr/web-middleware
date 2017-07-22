@@ -1,3 +1,4 @@
+ 
 '''
 Created on 9 Jul 2017
 
@@ -7,8 +8,9 @@ Created on 9 Jul 2017
 import logging,sys 
 
 # this bypasses the @trace decorators code if False, but @trace decorators should be commented out in release code
-DEBUGMODE=False
+DEBUGMODE=True
 
+ 
 def init(config):
     
     global DEBUGMODE 
@@ -34,6 +36,7 @@ def init(config):
     datalog.addHandler(dconsole)
     datalog.addHandler(dfile)
     
+ 
 def initdebug():
     
     if DEBUGMODE:
@@ -51,4 +54,4 @@ def initdebug():
  
 
 
-    
+   

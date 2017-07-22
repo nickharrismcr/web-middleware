@@ -1,3 +1,4 @@
+
 '''
 Created on 13 Jul 2017
 
@@ -5,16 +6,18 @@ Created on 13 Jul 2017
 '''
 
 import logging 
-
+from trace_decorator import TraceMetaClass
 from worker_socket import WorkerSocket
 from worker_stdio import WorkerStdio
 from socket_tcp import TCPSocket
 from socket_http import HTTPSocket 
 #from socket_http import HTTPSocket
 from converters import ConverterFactory 
+from _pyio import __metaclass__
        
 
 class Application(object):
+  
     '''
     start the worker. set up a processing chain :
         create appropriate connector objects for the source and sink 
@@ -84,4 +87,4 @@ class Application(object):
         
     
          
-            
+           

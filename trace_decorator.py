@@ -59,7 +59,7 @@ import types
 from functools import wraps
 from itertools import chain
 
-import log      #added njh for global debugmode 
+import log 
 
 FunctionTypes = tuple(set((
     types.BuiltinFunctionType,
@@ -683,4 +683,4 @@ class TraceMetaClass(type):
             hook = trace
         attachToClass(hook, klass, False)
         return klass
- 
+

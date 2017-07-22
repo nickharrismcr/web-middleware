@@ -6,7 +6,6 @@ Created on 17 Jul 2017
 import config_xml
 import xml.etree.ElementTree as ET
 import etree_fns as ETF
-from trace_decorator import trace 
 
 class ConverterFactory(object):
     
@@ -111,7 +110,6 @@ class SSVToXML:
         self.messageIDpath=config.get("message",messageID_elem,None) 
         
     #-----------------------------------------------------------------------------------------------        
-    @trace("debug")
     def convert(self, ssv):
         
         if not self.delim in ssv:
@@ -135,7 +133,6 @@ class SSVToXML:
         return rv
     
     #-----------------------------------------------------------------------------------------------        
-    @trace("debug")
     def addto_xml(self, rootnode, config_elem, lssv , offset=0 ): 
         
         config_elem.addto_xml(rootnode,lssv,offset)
@@ -143,4 +140,4 @@ class SSVToXML:
     #-----------------------------------------------------------------------------------------------        
  
                             
- 
+

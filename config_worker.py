@@ -47,8 +47,10 @@ class WorkerConfig(object):
         if section in self.items:
             if item in self.items[section].config:
                 return self.items[section][item]
+        
             elif default==None:
                 raise ParsingError("Config worker section : subsection %s : item %s not found " % (section, item))
+
         elif default==None:
             raise ParsingError("Config %s section : subsection %s not found " % section)   
    
@@ -58,6 +60,7 @@ class WorkerConfig(object):
     def check(self):
         # ensure all messages listed in the worker section have definitions in the message config sections 
         for k in self.items["message"].messages:
+             
             if not self.config.check_message_defined(k):
                 raise ParsingError("Message type %s is not defined " % k)
             
@@ -193,4 +196,4 @@ class WorkerEncapsulationConfig(object):
             
     def __getitem__(self,i):
         return self.config[i]
-                       
+                      

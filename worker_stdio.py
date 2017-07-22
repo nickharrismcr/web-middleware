@@ -65,4 +65,4 @@ class WorkerStdio(object):
         # can only be called by signal handler in main.py 
         self.running=False
         
-        
+       

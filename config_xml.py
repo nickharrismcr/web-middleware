@@ -191,4 +191,4 @@ class XMLRepeatConfig():
         if name in cls.xml_repeats:
             return cls.xml_repeats[name]
         raise StandardError("XMLRepeat section %s not defined " % name )
-    
+   

@@ -12,4 +12,4 @@ class WorkerSocket(object):
 
     def __init__(self, config):
     
-        pass
+        pas

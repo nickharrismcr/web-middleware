@@ -13,7 +13,6 @@ import xml.etree.ElementTree as ET
 import etree_fns as ETF 
  
 re_subsection = re.compile("^<.*>")
-from trace_decorator import trace 
 
 #---------------------------------------------------------------------------------------------------------------------                    
 def get_subsection(line):
@@ -193,7 +192,6 @@ class ConfigRepeat(object):
         self.ssv_col=int(col)-1
         self.config=config
 
-    @trace("debug")
     def addto_xml(self, rootnode, lssv , offset=0 ): 
         
             # repeater element. get the repeat group config and process its elements 
