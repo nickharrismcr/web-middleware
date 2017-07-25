@@ -6,16 +6,12 @@ Created on 13 Jul 2017
 '''
 
 import logging 
-from trace_decorator import TraceMetaClass
 from worker_socket import WorkerSocket
 from worker_stdio import WorkerStdio
 from socket_tcp import TCPSocket
 from socket_http import HTTPSocket 
-#from socket_http import HTTPSocket
 from converters import ConverterFactory 
-from _pyio import __metaclass__
-       
-
+ 
 class Application(object):
   
     '''

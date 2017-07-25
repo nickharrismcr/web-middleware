@@ -93,11 +93,11 @@ class Config:
     
     @property
     def logfilename(self):
-        return self.configs["worker"].get("main","log", "webmw.log")
+        return self.configs["worker"].get("main","log", "logs/webmw.log")
 
     @property
     def datalogfilename(self):
-        return self.configs["worker"].get("main", "datalog", "webmw.data.log")
+        return self.configs["worker"].get("main", "datalog", "logs/webmw.data.log")
     
     @property
     def conn_dir(self):

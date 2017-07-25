@@ -8,7 +8,7 @@ Created on 9 Jul 2017
 import logging,sys 
 
 # this bypasses the @trace decorators code if False, but @trace decorators should be commented out in release code
-DEBUGMODE=True
+DEBUGMODE=False
 
  
 def init(config):
@@ -45,7 +45,7 @@ def initdebug():
         debug.setLevel(level=logging.DEBUG)
         debconsole=logging.StreamHandler(stream=sys.stdout)
         debconsole.setFormatter(formatter)
-        debfile=logging.FileHandler(filename="webmw_python_debug.log")
+        debfile=logging.FileHandler(filename="logs/webmw_python_debug.log")
         debfile.setFormatter(formatter)
         debug.addHandler(debconsole)
         debug.addHandler(debfile)
